@@ -2,7 +2,6 @@ use windows::Win32::Foundation::RECT;
 
 const CANDIDATE_X_OFFSET: i32 = 15;
 const CANDIDATE_Y_GAP: i32 = 6;
-const INDICATOR_WINDOW_LEFT_OFFSET: i32 = 45;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct WindowPoint {
@@ -84,27 +83,6 @@ pub fn candidate_window_position(
     WindowPoint::new(x, y)
 }
 
-pub fn indicator_window_position(
-    target_rect: WindowRect,
-    indicator_size: WindowSize,
-    work_area: RECT,
-) -> WindowPoint {
-    WindowPoint::new(
-        clamp_start(
-            target_rect.left - INDICATOR_WINDOW_LEFT_OFFSET,
-            indicator_size.width,
-            work_area.left,
-            work_area.right,
-        ),
-        clamp_start(
-            target_rect.bottom,
-            indicator_size.height,
-            work_area.top,
-            work_area.bottom,
-        ),
-    )
-}
-
 fn clamp_start(preferred: i32, length: i32, min: i32, max: i32) -> i32 {
     if max <= min || length >= max - min {
         return min;
@@ -138,14 +116,4 @@ mod tests {
         assert_eq!(position, WindowPoint::new(560, 126));
     }
 
-    #[test]
-    fn indicator_uses_left_offset_and_bottom_anchor() {
-        let position = indicator_window_position(
-            WindowRect::new(100, 100, 120, 180),
-            WindowSize::new(90, 90),
-            work_area(),
-        );
-
-        assert_eq!(position, WindowPoint::new(55, 120));
-    }
 }

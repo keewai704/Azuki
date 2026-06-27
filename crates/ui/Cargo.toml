@@ -37,4 +37,5 @@ features = [
 ]
 
 [build-dependencies]
+embed-resource = "3.0.1"
 windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs.git", rev = "e614258cb68e0170fd9fa65fcb5c676ff6ffaa11" }

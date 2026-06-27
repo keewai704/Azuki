@@ -120,7 +120,7 @@ cargo xtask build [--debug|--release]
 
 `build`フォルダーが作成され、ビルドされた実行ファイルが格納されます。
 
-候補ウィンドウ UI と設定 UI は `crates/ui` の Rust / windows-rs / WinUI 3 アプリとして `ui.exe` と `settings.exe` に build されます。WebView、Tauri、React、C#、.NET は使用しません。
+候補ウィンドウ UI と設定 UI は `crates/ui` のネイティブ Windows UI として `ui.exe` と `settings.exe` に build されます。WebView、Tauri、React、C#、.NET は使用しません。
 
 配布用インストーラーは Inno Setup で作成する `build/azookey-setup.exe` の 1 種類です。旧 Web/NSIS インストーラーは生成・同梱しません。`settings.exe` を含むアプリ本体、IME DLL、サーバー、UI、ランチャー、辞書、EngineRuntime は Inno installer が `{commonpf}\Azookey` に配置します。
 

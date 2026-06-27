@@ -6,10 +6,57 @@ use shared::{
 const ZENZAI_BACKENDS: [&str; 1] = ["vulkan"];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SettingsPage {
+    pub id: &'static str,
+    pub title: &'static str,
+    pub description: &'static str,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct SettingsSection {
     pub id: &'static str,
     pub title: &'static str,
     pub description: &'static str,
+}
+
+pub fn settings_pages() -> &'static [SettingsPage] {
+    &[
+        SettingsPage {
+            id: "home",
+            title: "ホーム",
+            description: "Azookey の状態と主要な設定",
+        },
+        SettingsPage {
+            id: "general",
+            title: "一般",
+            description: "句読点入力と基本動作",
+        },
+        SettingsPage {
+            id: "input",
+            title: "入力",
+            description: "日本語入力の動作",
+        },
+        SettingsPage {
+            id: "candidate",
+            title: "候補",
+            description: "変換候補と読み表示",
+        },
+        SettingsPage {
+            id: "zenzai",
+            title: "Zenzai",
+            description: "Zenzai の有効化と backend",
+        },
+        SettingsPage {
+            id: "debug",
+            title: "デバッグ",
+            description: "ログ出力",
+        },
+        SettingsPage {
+            id: "info",
+            title: "情報",
+            description: "Azookey の情報",
+        },
+    ]
 }
 
 pub fn settings_sections() -> &'static [SettingsSection] {
@@ -17,37 +64,27 @@ pub fn settings_sections() -> &'static [SettingsSection] {
         SettingsSection {
             id: "general",
             title: "一般",
-            description: "句読点、スペース、候補表示の基本設定",
+            description: "句読点入力と基本動作",
         },
         SettingsSection {
             id: "input",
             title: "入力",
-            description: "ショートカットとローマ字テーブル",
+            description: "日本語入力の動作",
         },
         SettingsSection {
             id: "candidate",
-            title: "候補表示",
-            description: "候補ウィンドウとライブ変換の表示設定",
+            title: "候補",
+            description: "変換候補と読み表示",
         },
         SettingsSection {
             id: "zenzai",
             title: "Zenzai",
-            description: "Zenzai の有効化、backend、model 選択",
-        },
-        SettingsSection {
-            id: "dictionary",
-            title: "ユーザー辞書",
-            description: "ユーザー辞書エントリ",
-        },
-        SettingsSection {
-            id: "update",
-            title: "アップデート",
-            description: "更新確認とインストール場所",
+            description: "Zenzai の有効化と backend",
         },
         SettingsSection {
             id: "debug",
             title: "デバッグ",
-            description: "ログとクラッシュトレース",
+            description: "ログ出力",
         },
         SettingsSection {
             id: "info",
@@ -55,6 +92,37 @@ pub fn settings_sections() -> &'static [SettingsSection] {
             description: "Azookey の情報",
         },
     ]
+}
+
+pub fn page_title(id: &str) -> &'static str {
+    settings_pages()
+        .iter()
+        .find(|page| page.id == id)
+        .map(|page| page.title)
+        .unwrap_or("ホーム")
+}
+
+pub fn page_search_items() -> Vec<String> {
+    settings_pages()
+        .iter()
+        .flat_map(|page| [page.title, page.description])
+        .map(str::to_string)
+        .collect()
+}
+
+pub fn page_id_for_query(query: &str) -> Option<&'static str> {
+    let query = query.trim().to_lowercase();
+    if query.is_empty() {
+        return None;
+    }
+
+    settings_pages()
+        .iter()
+        .find(|page| {
+            page.title.to_lowercase().contains(&query)
+                || page.description.to_lowercase().contains(&query)
+        })
+        .map(|page| page.id)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -162,7 +230,7 @@ pub fn set_zenzai_backend_index(config: &mut AppConfig, index: i32) {
 fn settings_path_label() -> String {
     AppConfig::settings_path()
         .map(|path| path.display().to_string())
-        .unwrap_or_else(|error| format!("settings.json path unavailable: {error}"))
+        .unwrap_or_else(|error| format!("settings.json の場所を取得できません: {error}"))
 }
 
 #[cfg(test)]
@@ -178,16 +246,7 @@ mod tests {
 
         assert_eq!(
             titles,
-            vec![
-                "一般",
-                "入力",
-                "候補表示",
-                "Zenzai",
-                "ユーザー辞書",
-                "アップデート",
-                "デバッグ",
-                "情報",
-            ]
+            vec!["一般", "入力", "候補", "Zenzai", "デバッグ", "情報"]
         );
     }
 
@@ -220,6 +279,13 @@ mod tests {
         assert!(!all_text.contains("WinUI 3"));
         assert!(!all_text.contains("繝"));
         assert!(!all_text.contains("縺"));
+    }
+
+    #[test]
+    fn page_query_selects_matching_page() {
+        assert_eq!(page_id_for_query("候補"), Some("candidate"));
+        assert_eq!(page_id_for_query("backend"), Some("zenzai"));
+        assert_eq!(page_id_for_query(""), None);
     }
 
     #[test]
