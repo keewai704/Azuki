@@ -167,7 +167,6 @@ Create `apps/Azookey.UI/Azookey.UI.csproj`:
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>Azookey.UI</RootNamespace>
     <AssemblyName>ui</AssemblyName>
     <UseWinUI>true</UseWinUI>
@@ -192,7 +191,6 @@ Create `apps/Azookey.Settings/Azookey.Settings.csproj`:
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>Azookey.Settings</RootNamespace>
     <AssemblyName>frontend</AssemblyName>
     <UseWinUI>true</UseWinUI>
@@ -2294,7 +2292,7 @@ public static class WindowsAppRuntimeChecker
     {
         string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         string packages = Path.Combine(localAppData, "Microsoft", "WindowsApps");
-        return Directory.Exists(packages) || OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041);
+        return Directory.Exists(packages);
     }
 }
 ```

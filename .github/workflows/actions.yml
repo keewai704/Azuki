@@ -18,8 +18,8 @@ env:
   CARGO_TERM_COLOR: always
   SWIFT_VERSION: swift-6.1.2-release
   SWIFT_BUILD: 6.1.2-RELEASE
+  PROTOC_VERSION: 35.1
   LLAMA_RELEASE_VERSION: b4846
-  LLAMA_CPU_URL: https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-avx-x64.zip
   LLAMA_VULKAN_URL: https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-vulkan-x64.zip
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -44,29 +44,54 @@ jobs:
           targets: i686-pc-windows-msvc
 
       - name: Cache Rust
-        uses: Swatinem/rust-cache@v2
+        uses: actions/cache@v6
         with:
-          cache-bin: true
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/git/db
+            ~/.cargo/registry/cache
+            ~/.cargo/registry/index
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Install Inno Setup
         run: choco install innosetup --yes --no-progress
 
       - name: Install Swift
-        uses: compnerd/gha-setup-swift@main
-        with:
-          swift-version: ${{ env.SWIFT_VERSION }}
-          swift-build: ${{ env.SWIFT_BUILD }}
-          cache: true
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP "swift-${{ env.SWIFT_BUILD }}-windows10.exe"
+          $installLog = Join-Path $env:RUNNER_TEMP "swift-install.log"
+          $url = "https://download.swift.org/${{ env.SWIFT_VERSION }}/windows10/swift-${{ env.SWIFT_BUILD }}/swift-${{ env.SWIFT_BUILD }}-windows10.exe"
+
+          Invoke-WebRequest -Uri $url -OutFile $installer
+          $arguments = @("/quiet", "/log", $installLog)
+          $process = Start-Process -FilePath $installer -ArgumentList $arguments -Wait -PassThru -Verb RunAs
+          if ($process.ExitCode -ne 0 -and $process.ExitCode -ne 3010) {
+            Get-Content -LiteralPath $installLog -ErrorAction SilentlyContinue
+            throw "Swift installer exited with code $($process.ExitCode)"
+          }
+
+          foreach ($level in "Machine", "User") {
+            [Environment]::GetEnvironmentVariables($level).GetEnumerator() | ForEach-Object {
+              $name = [string]$_.Name
+              $value = [string]$_.Value
+              if ($name -eq "Path") {
+                $value = (($env:Path + ";" + $value) -split ";" | Select-Object -Unique) -join ";"
+              }
+              Set-Item -Path "Env:$name" -Value $value
+            }
+          }
+
+          $env:Path | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          Get-ChildItem Env: | ForEach-Object {
+            "$($_.Name)=$($_.Value)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+          "RESOLVED_SWIFT_VERSION=${{ env.SWIFT_VERSION }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RESOLVED_SWIFT_BUILD=${{ env.SWIFT_BUILD }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+          swift --version
 
       - name: Fix Swift SDK modulemap
         run: |
@@ -79,16 +104,22 @@ jobs:
           $modulemap.files.'ucrt.modulemap'.content | Set-Content -LiteralPath $destination -NoNewline -Encoding utf8
 
       - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $zip = Join-Path $env:RUNNER_TEMP "protoc-${{ env.PROTOC_VERSION }}-win64.zip"
+          $destination = Join-Path $env:RUNNER_TEMP "protoc"
+          Invoke-WebRequest `
+            -Uri "https://github.com/protocolbuffers/protobuf/releases/download/v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}-win64.zip" `
+            -OutFile $zip
+          New-Item -Path $destination -ItemType Directory -Force | Out-Null
+          Expand-Archive -Path $zip -DestinationPath $destination -Force
+          "$destination\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          & "$destination\bin\protoc.exe" --version
 
       - name: Cache external native assets
         id: cache-native-assets
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
-            llama_cpu
             llama_vulkan
           key: ${{ runner.os }}-llama-${{ env.LLAMA_RELEASE_VERSION }}-${{ hashFiles('.github/workflows/actions.yml') }}
           restore-keys: |
@@ -110,11 +141,10 @@ jobs:
             Remove-Item $tempZip -Force
           }
 
-          Download-Extract -Url "${{ env.LLAMA_CPU_URL }}" -Destination "llama_cpu"
           Download-Extract -Url "${{ env.LLAMA_VULKAN_URL }}" -Destination "llama_vulkan"
 
       - name: Prepare Swift native library
-        run: Copy-Item "llama_cpu\llama.lib" -Destination "server-swift\" -Force
+        run: Copy-Item "llama_vulkan\llama.lib" -Destination "server-swift\" -Force
 
       - name: Check formatting
         run: cargo xtask fmt --check
@@ -128,7 +158,7 @@ jobs:
           "$($hash.Hash.ToLowerInvariant())  azookey-setup.exe" | Set-Content -LiteralPath "build\azookey-setup.exe.sha256" -NoNewline -Encoding ascii
 
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: azookey-setup
           path: |

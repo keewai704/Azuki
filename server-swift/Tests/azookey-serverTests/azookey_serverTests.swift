@@ -634,21 +634,19 @@ private func testCandidate(
     )
 }
 
-@Test func cpuBackendIsDisabledWhenAvxIsUnavailable() async throws {
+@Test func legacyCpuBackendUsesVulkanRuntime() async throws {
     let enabled = effectiveZenzaiRuntimeEnabled(
         isConfigured: true,
-        backend: "cpu",
-        cpuBackendSupported: false
+        backend: "cpu"
     )
 
-    #expect(enabled == false)
+    #expect(enabled)
 }
 
-@Test func nonCpuBackendRemainsAvailableWithoutCpuAvx() async throws {
+@Test func vulkanBackendRemainsAvailable() async throws {
     let enabled = effectiveZenzaiRuntimeEnabled(
         isConfigured: true,
-        backend: "vulkan",
-        cpuBackendSupported: false
+        backend: "vulkan"
     )
 
     #expect(enabled)
@@ -656,7 +654,8 @@ private func testCandidate(
 
 @Test func zenzaiBackendNormalizationIgnoresCaseAndWhitespace() async throws {
     #expect(normalizedZenzaiBackend(" Vulkan ") == "vulkan")
-    #expect(normalizedZenzaiBackend(nil) == "cpu")
+    #expect(normalizedZenzaiBackend(nil) == "vulkan")
+    #expect(normalizedZenzaiBackend("cpu") == "vulkan")
 }
 
 @Test func serverOptionsDisableJapanesePrediction() async throws {

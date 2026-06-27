@@ -1,25 +1,40 @@
 [package]
-name = "ui"
+name = "azookey-ui"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
+
+[[bin]]
+name = "ui"
+path = "src/bin/ui.rs"
+
+[[bin]]
+name = "settings"
+path = "src/bin/settings.rs"
 
 [dependencies]
 anyhow = "1.0.95"
-tao = "0.31.0"
-wry = "0.47.2"
+async-stream = "0.3.6"
+futures-core = "0.3.31"
 tokio = { version = "1.42.0", features = ["full"] }
 tonic = "0.12.3"
 shared = { path = "../shared" }
-azookey-server = { path = "../server" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+windows-reactor = { git = "https://github.com/microsoft/windows-rs.git", rev = "e614258cb68e0170fd9fa65fcb5c676ff6ffaa11" }
 
 [dependencies.windows]
 version = "0.58.0"
 features = [
     "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
     "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_Environment",
     "Win32_Graphics_Gdi",
     "Win32_UI_HiDpi",
+    "Win32_UI_WindowsAndMessaging",
 ]
+
+[build-dependencies]
+windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs.git", rev = "e614258cb68e0170fd9fa65fcb5c676ff6ffaa11" }

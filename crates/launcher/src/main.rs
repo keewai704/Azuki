@@ -1,6 +1,6 @@
 mod zenzai_model_download;
 
-use shared::{zenzai_cpu_backend_supported, AppConfig};
+use shared::AppConfig;
 use std::collections::VecDeque;
 use std::ffi::c_void;
 use std::fs::{self, File};
@@ -44,21 +44,13 @@ const LAUNCHER_CRASH_TRACE_FILE_NAME: &str = "launcher-crash-trace.json";
 const LAUNCHER_PREVIOUS_CRASH_TRACE_FILE_NAME: &str = "launcher-crash-trace.previous.json";
 
 fn main() -> anyhow::Result<()> {
-    let cpu_backend_supported = zenzai_cpu_backend_supported();
-    env::set_var(
-        "AZOOKEY_ZENZAI_CPU_SUPPORTED",
-        if cpu_backend_supported { "1" } else { "0" },
-    );
-
     let exe_path = env::current_exe()?.parent().unwrap().to_path_buf();
     let (command_tx, command_rx) = mpsc::channel();
     start_launcher_command_listener(command_tx);
 
     let server_exe_path = exe_path.clone();
     let server_handle = thread::spawn(move || {
-        if let Err(error) =
-            watch_server_process(&server_exe_path, cpu_backend_supported, command_rx)
-        {
+        if let Err(error) = watch_server_process(&server_exe_path, command_rx) {
             eprintln!("[launcher] server watchdog stopped: {error:?}");
         }
     });
@@ -74,13 +66,12 @@ fn main() -> anyhow::Result<()> {
 
 fn watch_server_process(
     install_dir: &Path,
-    cpu_backend_supported: bool,
     command_rx: Receiver<LauncherCommand>,
 ) -> anyhow::Result<()> {
     let mut recent_restarts = VecDeque::new();
 
     loop {
-        let mut server = start_server_process(install_dir, cpu_backend_supported)?;
+        let mut server = start_server_process(install_dir)?;
         let status = wait_for_server_exit_or_restart_request(&mut server, &command_rx)?;
         let restart_delay = match status {
             ServerExit::Exited(status) => {
@@ -128,12 +119,8 @@ fn restart_delay_after_server_exit(
     }
 }
 
-fn start_server_process(install_dir: &Path, cpu_backend_supported: bool) -> anyhow::Result<Child> {
+fn start_server_process(install_dir: &Path) -> anyhow::Result<Child> {
     let config = load_config();
-
-    if config.zenzai.enable && config.zenzai.backend == "cpu" && !cpu_backend_supported {
-        eprintln!("[launcher] CPU backend requires AVX support. Zenzai will fall back to standard conversion.");
-    }
 
     let mut command = process_command_with_backend(install_dir, "azookey-server.exe", &config);
     let downloader = BlockingModelDownloader::new();
@@ -148,10 +135,6 @@ fn start_server_process(install_dir: &Path, cpu_backend_supported: bool) -> anyh
         eprintln!("[launcher] failed to ensure zenzai model: {error}");
     }
     apply_zenzai_model_env(&mut command, model_result.path.as_deref());
-    command.env(
-        "AZOOKEY_ZENZAI_CPU_SUPPORTED",
-        if cpu_backend_supported { "1" } else { "0" },
-    );
 
     let model_details = match (&model_result.path, &model_result.error) {
         (Some(path), _) => format!("zenzai_model_path={}", path.display()),
@@ -159,11 +142,10 @@ fn start_server_process(install_dir: &Path, cpu_backend_supported: bool) -> anyh
         (None, None) => "zenzai_model_path=".to_string(),
     };
     let startup_details = format!(
-        "backend={};backend_dir={};zenzai_enable={};cpu_backend_supported={};{}",
+        "backend={};backend_dir={};zenzai_enable={};{}",
         config.zenzai.backend,
-        backend_dir(&config).display(),
+        backend_dir().display(),
         config.zenzai.enable,
-        cpu_backend_supported,
         model_details
     );
     write_launcher_crash_trace(
@@ -203,9 +185,9 @@ fn start_ui_process(install_dir: &Path) -> anyhow::Result<Child> {
     spawn_process(command, "ui.exe", "[ui]")
 }
 
-fn process_command_with_backend(install_dir: &Path, exe: &str, config: &AppConfig) -> Command {
+fn process_command_with_backend(install_dir: &Path, exe: &str, _config: &AppConfig) -> Command {
     let swift_runtime_path = install_dir.join(swift_runtime_dir());
-    let backend_path = install_dir.join(backend_dir(config));
+    let backend_path = install_dir.join(backend_dir());
     let mut command = process_command(install_dir, exe);
     command.env("PATH", prepend_to_path(&[swift_runtime_path, backend_path]));
     command
@@ -633,12 +615,8 @@ fn swift_runtime_dir() -> PathBuf {
     PathBuf::from("EngineRuntime").join("Swift")
 }
 
-fn backend_dir(config: &AppConfig) -> PathBuf {
-    let backend = match config.zenzai.backend.as_str() {
-        "vulkan" | "cuda" => "llama_vulkan",
-        _ => "llama_cpu",
-    };
-    PathBuf::from("EngineRuntime").join(backend)
+fn backend_dir() -> PathBuf {
+    PathBuf::from("EngineRuntime").join("llama_vulkan")
 }
 
 fn prepend_to_path(paths: &[PathBuf]) -> String {
@@ -775,22 +753,8 @@ mod tests {
     }
 
     #[test]
-    fn backend_dir_maps_cuda_to_vulkan_directory() {
-        let cpu = AppConfig::default();
-        let mut vulkan = AppConfig::default();
-        vulkan.zenzai.backend = "vulkan".to_string();
-        let mut cuda = AppConfig::default();
-        cuda.zenzai.backend = "cuda".to_string();
-
-        assert_eq!(backend_dir(&cpu), PathBuf::from("EngineRuntime/llama_cpu"));
-        assert_eq!(
-            backend_dir(&vulkan),
-            PathBuf::from("EngineRuntime/llama_vulkan")
-        );
-        assert_eq!(
-            backend_dir(&cuda),
-            PathBuf::from("EngineRuntime/llama_vulkan")
-        );
+    fn backend_dir_maps_to_vulkan_directory() {
+        assert_eq!(backend_dir(), PathBuf::from("EngineRuntime/llama_vulkan"));
     }
 
     #[test]

@@ -3,7 +3,7 @@
     "zenzai": {
         "enable": false,
         "profile": "",
-        "backend": "cpu"
+        "backend": "vulkan"
     },
     "shortcuts": {
         "ctrl_space_toggle": true,

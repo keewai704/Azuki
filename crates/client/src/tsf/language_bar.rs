@@ -166,7 +166,17 @@ impl ITfLangBarItem_Impl for TextServiceFactory_Impl {
     // this will be shown as a tooltip when you hover the language bar item
     #[macros::anyhow]
     fn GetTooltipString(&self) -> Result<BSTR> {
-        Ok(BSTR::default())
+        let keyboard_disabled = IMEState::keyboard_disabled()?;
+        let input_mode = if keyboard_disabled {
+            InputMode::Latin
+        } else {
+            IMEState::input_mode()?
+        };
+
+        Ok(BSTR::from(language_bar_tooltip(
+            input_mode,
+            keyboard_disabled,
+        )))
     }
 }
 
@@ -351,12 +361,19 @@ fn show_settings_menu(pt: &POINT) -> Result<Option<u32>> {
     unsafe {
         let owner = create_menu_owner_window()?;
         let menu = PopupMenu(CreatePopupMenu()?);
-        AppendMenuW(menu.0, MF_STRING, SETTINGS_MENU_ID, w!("設定"))?;
+        let settings_label = settings_menu_label().to_wide_16();
+        let restart_label = restart_server_menu_label().to_wide_16();
+        AppendMenuW(
+            menu.0,
+            MF_STRING,
+            SETTINGS_MENU_ID,
+            PCWSTR(settings_label.as_ptr()),
+        )?;
         AppendMenuW(
             menu.0,
             MF_STRING,
             RESTART_SERVER_MENU_ID,
-            w!("サーバー再起動"),
+            PCWSTR(restart_label.as_ptr()),
         )?;
 
         let _ = SetForegroundWindow(owner.hwnd);
@@ -795,10 +812,12 @@ impl ITfSource_Impl for TextServiceFactory_Impl {
 #[cfg(test)]
 mod tests {
     use super::{
-        parse_launcher_response, resolve_settings_app_path_from_install_location,
-        select_existing_settings_app_path, trim_registry_string, SettingsAppPath,
-        SETTINGS_APP_FILENAME,
+        language_bar_tooltip, parse_launcher_response,
+        resolve_settings_app_path_from_install_location, restart_server_menu_label,
+        select_existing_settings_app_path, settings_menu_label, trim_registry_string,
+        SettingsAppPath, SETTINGS_APP_FILENAME,
     };
+    use crate::engine::input_mode::InputMode;
     use std::path::PathBuf;
 
     #[test]
@@ -901,4 +920,42 @@ mod tests {
         let error = parse_launcher_response(b"error:denied\n").unwrap_err();
         assert!(error.to_string().contains("denied"));
     }
+
+    #[test]
+    fn language_bar_tooltip_names_current_input_mode() {
+        assert_eq!(
+            language_bar_tooltip(InputMode::Kana, false),
+            "azooKey: ひらがな"
+        );
+        assert_eq!(
+            language_bar_tooltip(InputMode::Latin, false),
+            "azooKey: 英数"
+        );
+        assert_eq!(language_bar_tooltip(InputMode::Kana, true), "azooKey: 無効");
+    }
+
+    #[test]
+    fn context_menu_labels_use_native_japanese_commands() {
+        assert_eq!(settings_menu_label(), "設定を開く");
+        assert_eq!(restart_server_menu_label(), "変換サーバーを再起動");
+    }
+}
+
+fn language_bar_tooltip(input_mode: InputMode, keyboard_disabled: bool) -> &'static str {
+    if keyboard_disabled {
+        return "azooKey: 無効";
+    }
+
+    match input_mode {
+        InputMode::Kana => "azooKey: ひらがな",
+        InputMode::Latin => "azooKey: 英数",
+    }
+}
+
+fn settings_menu_label() -> &'static str {
+    "設定を開く"
+}
+
+fn restart_server_menu_label() -> &'static str {
+    "変換サーバーを再起動"
 }

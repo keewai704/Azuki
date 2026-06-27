@@ -32,7 +32,7 @@ private let fallbackDictionaryURL =
 @MainActor var config: [String : Any] = [
     "enable": false,
     "profile": "",
-    "backend": "cpu",
+    "backend": "vulkan",
 ]
 let maxUserDictionaryEntryCount = 50
 let minInputCountForZenzaiCandidates = 4
@@ -377,14 +377,15 @@ private func readAppSettings(at path: URL) throws -> AppSettings {
 }
 
 func normalizedZenzaiBackend(_ backend: String?) -> String {
-    (backend ?? "cpu")
+    let normalized = (backend ?? "vulkan")
         .trimmingCharacters(in: .whitespacesAndNewlines)
         .lowercased()
+    return normalized == "vulkan" ? normalized : "vulkan"
 }
 
 private func shouldOffloadZenzaiToGpu(zenzaiEnabled: Bool, backend: String?) -> Bool {
     let normalizedBackend = normalizedZenzaiBackend(backend)
-    return zenzaiEnabled && !normalizedBackend.isEmpty && normalizedBackend != "cpu"
+    return zenzaiEnabled && normalizedBackend == "vulkan"
 }
 
 @MainActor private func configureEngineRuntime(zenzaiEnabled: Bool) {
@@ -489,24 +490,13 @@ func effectiveZenzaiEnabledForCandidates(
 
 func effectiveZenzaiRuntimeEnabled(
     isConfigured: Bool,
-    backend: String?,
-    cpuBackendSupported: Bool
+    backend: String?
 ) -> Bool {
     guard isConfigured else {
         return false
     }
 
-    let normalizedBackend = normalizedZenzaiBackend(backend)
-
-    if normalizedBackend.isEmpty || normalizedBackend == "cpu" {
-        return cpuBackendSupported
-    }
-
-    return true
-}
-
-private func cpuZenzaiBackendSupportedFromEnvironment() -> Bool {
-    ProcessInfo.processInfo.environment["AZOOKEY_ZENZAI_CPU_SUPPORTED"] != "0"
+    return normalizedZenzaiBackend(backend) == "vulkan"
 }
 
 @MainActor private func setRoman2KanaInputStyle() {
@@ -1100,8 +1090,7 @@ private func preferCursorPrefixBoundary(
         context: context,
         zenzaiEnabled: effectiveZenzaiRuntimeEnabled(
             isConfigured: (config["enable"] as? Bool) ?? false,
-            backend: config["backend"] as? String,
-            cpuBackendSupported: cpuZenzaiBackendSupportedFromEnvironment()
+            backend: config["backend"] as? String
         )
     )
 }
@@ -1129,8 +1118,7 @@ private func preferCursorPrefixBoundary(
 @MainActor private func currentRuntimeZenzaiEnabled() -> Bool {
     effectiveZenzaiRuntimeEnabled(
         isConfigured: (config["enable"] as? Bool) ?? false,
-        backend: config["backend"] as? String,
-        cpuBackendSupported: cpuZenzaiBackendSupportedFromEnvironment()
+        backend: config["backend"] as? String
     )
 }
 
@@ -1139,25 +1127,21 @@ private struct ZenzaiDiagnosticSnapshot {
     let backend: String
     let normalizedBackend: String
     let profileLength: Int
-    let cpuBackendSupported: Bool
     let runtimeEnabled: Bool
 }
 
 @MainActor private func zenzaiDiagnosticSnapshot() -> ZenzaiDiagnosticSnapshot {
     let configuredEnabled = (config["enable"] as? Bool) ?? false
-    let backend = (config["backend"] as? String) ?? "cpu"
+    let backend = (config["backend"] as? String) ?? "vulkan"
     let profile = (config["profile"] as? String) ?? ""
-    let cpuBackendSupported = cpuZenzaiBackendSupportedFromEnvironment()
     return ZenzaiDiagnosticSnapshot(
         configuredEnabled: configuredEnabled,
         backend: backend,
         normalizedBackend: normalizedZenzaiBackend(backend),
         profileLength: profile.count,
-        cpuBackendSupported: cpuBackendSupported,
         runtimeEnabled: effectiveZenzaiRuntimeEnabled(
             isConfigured: configuredEnabled,
-            backend: backend,
-            cpuBackendSupported: cpuBackendSupported
+            backend: backend
         )
     )
 }
@@ -1192,7 +1176,6 @@ private func sanitizeDiagnosticField(_ value: String, maxLength: Int = 80) -> St
         "use_zenzai=\(useZenzai)",
         "backend=\(sanitizeDiagnosticField(snapshot.normalizedBackend))",
         "backend_raw=\(sanitizeDiagnosticField(snapshot.backend))",
-        "cpu_backend_supported=\(snapshot.cpuBackendSupported)",
         "profile_len=\(snapshot.profileLength)",
         "context_len=\(contextLength)",
         "input_count=\(inputCount)",
@@ -1433,21 +1416,6 @@ private let backgroundWarmupRunner = BackgroundWarmupRunner()
     )
 }
 
-class SimpleComposingText {
-    init(text: String, cursor: Int) {
-        self.text = UnsafeMutablePointer<CChar>(mutating: text.utf8String)!
-        self.cursor = cursor
-    }
-
-    var text: UnsafeMutablePointer<CChar>
-    var cursor: Int
-}
-
-struct SComposingText {
-    var text: UnsafeMutablePointer<CChar>
-    var cursor: Int
-}
-
 func constructCandidateString(candidate: Candidate, hiragana: String) -> String {
     var result = ""
     result.reserveCapacity(hiragana.count)
@@ -1582,11 +1550,10 @@ func cursorPrefixBoundaryFirstClauseResults(
     serverLog("INFO", "LoadConfig: start")
     let previousZenzaiEnabled = (config["enable"] as? Bool) ?? false
     let previousProfile = (config["profile"] as? String) ?? ""
-    let previousBackend = (config["backend"] as? String) ?? "cpu"
+    let previousBackend = (config["backend"] as? String) ?? "vulkan"
     let previousEffectiveZenzaiEnabled = effectiveZenzaiRuntimeEnabled(
         isConfigured: previousZenzaiEnabled,
-        backend: previousBackend,
-        cpuBackendSupported: cpuZenzaiBackendSupportedFromEnvironment()
+        backend: previousBackend
     )
     let previousUsedCustomRomajiTable = customRomajiTableEnabled
     var dynamicUserDictionary: [DicdataElement] = []
@@ -1597,7 +1564,7 @@ func cursorPrefixBoundaryFirstClauseResults(
 
     config["enable"] = false
     config["profile"] = ""
-    config["backend"] = "cpu"
+    config["backend"] = "vulkan"
     setRoman2KanaInputStyle()
 
     if let settings = loadedSettings {
@@ -1615,7 +1582,7 @@ func cursorPrefixBoundaryFirstClauseResults(
             }
 
             if let backendValue = zenzai.backend {
-                config["backend"] = backendValue
+                config["backend"] = normalizedZenzaiBackend(backendValue)
             }
         }
 
@@ -1666,11 +1633,10 @@ func cursorPrefixBoundaryFirstClauseResults(
 
     let currentZenzaiEnabled = (config["enable"] as? Bool) ?? false
     let currentProfile = (config["profile"] as? String) ?? ""
-    let currentBackend = (config["backend"] as? String) ?? "cpu"
+    let currentBackend = (config["backend"] as? String) ?? "vulkan"
     let currentEffectiveZenzaiEnabled = effectiveZenzaiRuntimeEnabled(
         isConfigured: currentZenzaiEnabled,
-        backend: currentBackend,
-        cpuBackendSupported: cpuZenzaiBackendSupportedFromEnvironment()
+        backend: currentBackend
     )
     let currentUsedCustomRomajiTable = customRomajiTableEnabled
     let backendChanged = normalizedZenzaiBackend(previousBackend) != normalizedZenzaiBackend(currentBackend)

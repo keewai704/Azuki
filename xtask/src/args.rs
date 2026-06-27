@@ -39,8 +39,8 @@ where
                 steps: vec![Step::BuildX86(profile)],
             })
         }
-        "build-winui" => no_args(&command, &rest).map(|()| CommandPlan {
-            steps: vec![Step::BuildWinui],
+        "build-ui" => no_args(&command, &rest).map(|()| CommandPlan {
+            steps: vec![Step::BuildUi],
         }),
         "post-build" => {
             let profile = parse_profile(&rest)?;
@@ -59,7 +59,7 @@ where
                     Step::BuildSwift,
                     Step::BuildX64(profile),
                     Step::BuildX86(profile),
-                    Step::BuildWinui,
+                    Step::BuildUi,
                     Step::PostBuild(profile),
                     Step::BuildInstaller,
                 ],
@@ -103,7 +103,7 @@ pub(crate) fn usage() -> &'static str {
   cargo xtask build-swift
   cargo xtask build-x64 [--debug|--release]
   cargo xtask build-x86 [--debug|--release]
-  cargo xtask build-winui
+  cargo xtask build-ui
   cargo xtask post-build [--debug|--release]
   cargo xtask build-installer"
 }
@@ -123,7 +123,7 @@ mod tests {
                 Step::BuildSwift,
                 Step::BuildX64(Profile::Release),
                 Step::BuildX86(Profile::Release),
-                Step::BuildWinui,
+                Step::BuildUi,
                 Step::PostBuild(Profile::Release),
                 Step::BuildInstaller,
             ]
@@ -142,5 +142,13 @@ mod tests {
         let plan = command_plan(["build-x64", "--release"]).unwrap();
 
         assert_eq!(plan.steps, vec![Step::BuildX64(Profile::Release)]);
+    }
+
+    #[test]
+    fn build_ui_replaces_csharp_winui_publish() {
+        let plan = command_plan(["build-ui"]).unwrap();
+
+        assert_eq!(plan.steps, vec![Step::BuildUi]);
+        assert!(command_plan(["build-winui"]).is_err());
     }
 }

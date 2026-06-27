@@ -50,20 +50,14 @@ FinishedRestartLabel=Azookey の更新を完了するには、Windows の再起�
 FinishedRestartMessage=Azookey の更新を完了するには、Windows の再起動が必要です。%n%n再起動後に新しいバージョンが有効になります。今すぐ再起動しますか?
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "../build/azookey_windows.dll"; DestDir: "{app}"; DestName: "azookey.dll"; Flags: ignoreversion regserver 64bit restartreplace uninsrestartdelete
 Source: "../build/x86/azookey_windows.dll"; DestDir: "{app}"; DestName: "azookey32.dll"; Flags: ignoreversion regserver 32bit restartreplace uninsrestartdelete
 Source: "../build/*.exe"; DestDir: "{app}"; Excludes: "azookey-setup.exe"; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: "../build/*.dll"; DestDir: "{app}"; Excludes: "azookey_windows.dll,azookey-server.dll"; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: "../build/*.json"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: "../build/*.pri"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: "../build/*.xbf"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: "../build/*.txt"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete
-Source: "../build/Windows/*"; DestDir: "{app}\Windows"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
-Source: "../build/Controls/*"; DestDir: "{app}\Controls"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
-Source: "../build/Pages/*"; DestDir: "{app}\Pages"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
 Source: "../build/Dictionary/*"; DestDir: "{app}\Dictionary"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
 Source: "../build/EmojiDictionary/*"; DestDir: "{app}\EmojiDictionary"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
 Source: "../build/EngineRuntime/*"; DestDir: "{app}\EngineRuntime"; Flags: ignoreversion recursesubdirs createallsubdirs restartreplace uninsrestartdelete
@@ -75,13 +69,10 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MySettingsAppName}"; Wo
 
 [InstallDelete]
 Type: files; Name: "{app}\uninstall.exe"
-Type: files; Name: "{app}\Windows\RubyWindow.xbf"
 Type: files; Name: "{app}\zenz.gguf"
-Type: files; Name: "{app}\frontend.exe"
-Type: files; Name: "{app}\frontend.dll"
-Type: files; Name: "{app}\frontend.deps.json"
-Type: files; Name: "{app}\frontend.runtimeconfig.json"
-Type: files; Name: "{app}\frontend.pri"
+Type: filesandordirs; Name: "{app}\Windows"
+Type: filesandordirs; Name: "{app}\Controls"
+Type: filesandordirs; Name: "{app}\Pages"
 Type: filesandordirs; Name: "{app}\settings-app"
 Type: filesandordirs; Name: "{app}\llama_cpu"
 Type: filesandordirs; Name: "{app}\llama_vulkan"
@@ -101,15 +92,14 @@ Filename: "icacls"; \
   Parameters: "{app}\azookey32.dll /grant ""*S-1-15-2-1:(RX)"""; \
   Description: "Grant Permission"; \
   Flags: runhidden postinstall runascurrentuser
+Filename: "{app}\{#MySettingsAppName}"; \
+  Description: "設定を開く"; \
+  Flags: postinstall nowait skipifsilent
 
 [UninstallRun]
 Filename: "taskkill"; \
   Parameters: "/F /IM ""settings.exe"""; \
   RunOnceId: "StopSettings"; \
-  Flags: runhidden
-Filename: "taskkill"; \
-  Parameters: "/F /IM ""frontend.exe"""; \
-  RunOnceId: "StopLegacyFrontend"; \
   Flags: runhidden
 ; Stop launcher before server so the watchdog cannot respawn it during uninstall.
 Filename: "taskkill"; \
@@ -288,7 +278,6 @@ begin
 
   Dependency_AddVC2015To2022x64;
   Dependency_AddVC2015To2022x86;
-  Dependency_AddDotNet100Desktop;
   Dependency_AddWindowsAppRuntime220x64;
 
   Result := True;
@@ -320,7 +309,6 @@ end;
 procedure StopAzookeyProcessesBeforeInstall();
 begin
   StopAzookeyProcess('settings.exe', False);
-  StopAzookeyProcess('frontend.exe', False);
   // Stop launcher before server so the watchdog cannot respawn it during install/update.
   StopAzookeyProcess('launcher.exe', True);
   StopAzookeyProcess('azookey-server.exe', True);
