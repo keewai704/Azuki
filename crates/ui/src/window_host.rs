@@ -1,6 +1,6 @@
 use crate::{
     geometry::{candidate_window_position, WindowPoint, WindowSize},
-    CandidateState, WindowRect,
+    CandidateState,
 };
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::{HWND, POINT, RECT};
@@ -85,12 +85,7 @@ pub fn candidate_popup_plan(
 
 pub fn find_candidate_window() -> Option<HWND> {
     let title = wide_null(CANDIDATE_WINDOW_TITLE);
-    let hwnd = unsafe { FindWindowW(None, PCWSTR(title.as_ptr())) };
-    if hwnd.0 == 0 {
-        None
-    } else {
-        Some(hwnd)
-    }
+    unsafe { FindWindowW(None, PCWSTR(title.as_ptr())).ok() }.filter(|hwnd| hwnd.0 != 0)
 }
 
 pub fn configure_candidate_window(hwnd: HWND) {
@@ -160,7 +155,7 @@ fn clamp_start(preferred: i32, length: i32, min: i32, max: i32) -> i32 {
 
 fn cursor_position() -> Option<WindowPoint> {
     let mut point = POINT::default();
-    if unsafe { GetCursorPos(&mut point).as_bool() } {
+    if unsafe { GetCursorPos(&mut point).is_ok() } {
         Some(WindowPoint::new(point.x, point.y))
     } else {
         None
@@ -204,6 +199,7 @@ fn wide_null(value: &str) -> Vec<u16> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::WindowRect;
     use windows::Win32::Foundation::RECT;
 
     fn work_area() -> RECT {
