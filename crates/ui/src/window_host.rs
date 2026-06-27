@@ -108,7 +108,7 @@ pub fn apply_candidate_window(hwnd: HWND, state: &CandidateState) {
 
     match candidate_popup_plan(state, size, work_area, cursor) {
         CandidatePopupPlan::Hide => unsafe {
-            ShowWindow(hwnd, SW_HIDE);
+            let _ = ShowWindow(hwnd, SW_HIDE);
         },
         CandidatePopupPlan::Show { origin, size, .. } => unsafe {
             let _ = SetWindowPos(
@@ -126,7 +126,7 @@ pub fn apply_candidate_window(hwnd: HWND, state: &CandidateState) {
 
 pub fn hide_candidate_window(hwnd: HWND) {
     unsafe {
-        ShowWindow(hwnd, SW_HIDE);
+        let _ = ShowWindow(hwnd, SW_HIDE);
         let _ = SetWindowPos(
             hwnd,
             HWND_TOPMOST,
@@ -221,6 +221,19 @@ mod tests {
     }
 
     #[test]
+    fn popup_plan_hides_visible_state_without_candidates_or_reading() {
+        let state = CandidateState {
+            visible: true,
+            candidate_list_visible: true,
+            ..CandidateState::default()
+        };
+
+        let plan = super::candidate_popup_plan(&state, WindowSize::new(320, 96), work_area(), None);
+
+        assert_eq!(plan, super::CandidatePopupPlan::Hide);
+    }
+
+    #[test]
     fn popup_plan_positions_visible_candidates_without_activation() {
         let state = CandidateState {
             visible: true,
@@ -240,6 +253,25 @@ mod tests {
                 size: WindowSize::new(320, 96),
                 used_cursor_fallback: false,
             }
+        );
+    }
+
+    #[test]
+    fn candidate_window_size_includes_reading_and_candidate_rows() {
+        let state = CandidateState {
+            reading: Some("azookey".to_string()),
+            candidates: vec![
+                "candidate 1".to_string(),
+                "candidate 2".to_string(),
+                "candidate 3".to_string(),
+            ],
+            candidate_list_visible: true,
+            ..CandidateState::default()
+        };
+
+        assert_eq!(
+            super::candidate_window_size(&state),
+            WindowSize::new(360, 24 + 3 * 32 + 16)
         );
     }
 

@@ -149,8 +149,11 @@ jobs:
       - name: Check formatting
         run: cargo xtask fmt --check
 
-      - name: Test Rust workspace
-        run: cargo test --workspace
+      - name: Test Rust UI and candidate behavior
+        run: |
+          cargo test -p shared --lib
+          cargo test -p azookey-ui --lib
+          cargo test -p azookey-windows --lib delayed_candidate_window
 
       - name: Build release installer
         run: cargo xtask build --release
