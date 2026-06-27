@@ -133,11 +133,15 @@ fn render_settings(cx: &mut RenderCx) -> Element {
 fn nav_items() -> Vec<NavViewItem> {
     vec![
         NavViewItem::new("ホーム").tag("home").icon(Symbol::Home),
-        NavViewItem::new("一般").tag("general").icon(Symbol::Setting),
+        NavViewItem::new("一般")
+            .tag("general")
+            .icon(Symbol::Setting),
         NavViewItem::new("入力").tag("input").icon(Symbol::Keyboard),
         NavViewItem::new("候補").tag("candidate").icon(Symbol::List),
         NavViewItem::new("Zenzai").tag("zenzai").icon(Symbol::World),
-        NavViewItem::new("デバッグ").tag("debug").icon(Symbol::Repair),
+        NavViewItem::new("デバッグ")
+            .tag("debug")
+            .icon(Symbol::Repair),
         NavViewItem::new("情報").tag("info").icon(Symbol::Help),
     ]
 }
@@ -169,7 +173,11 @@ fn settings_page(
             "日本語入力の動作",
             vec![
                 value_row("入力方式", "ローマ字かな変換", "Azookey"),
-                value_row("設定ファイル", "現在の settings.json", &snapshot.settings_path),
+                value_row(
+                    "設定ファイル",
+                    "現在の settings.json",
+                    &snapshot.settings_path,
+                ),
             ],
         ),
         "candidate" => page_body(
@@ -346,7 +354,9 @@ fn value_row(title: &str, description: &str, value: &str) -> Element {
 fn status_card(title: &str, value: &str) -> Element {
     card(
         vstack((
-            text_block(title).font_size(13.0).foreground(ThemeRef::SecondaryText),
+            text_block(title)
+                .font_size(13.0)
+                .foreground(ThemeRef::SecondaryText),
             text_block(value).font_size(16.0).semibold().wrap(),
         ))
         .spacing(6.0)
@@ -385,10 +395,14 @@ fn reading_slider(
             .step(1.0)
             .on_value_changed(on_value_changed)
             .width(220.0),
-        text_block(snapshot.live_conversion_reading_vertical_adjustment.to_string())
-            .font_size(13.0)
-            .foreground(ThemeRef::SecondaryText)
-            .width(32.0),
+        text_block(
+            snapshot
+                .live_conversion_reading_vertical_adjustment
+                .to_string(),
+        )
+        .font_size(13.0)
+        .foreground(ThemeRef::SecondaryText)
+        .width(32.0),
     ))
     .spacing(10.0)
     .into()

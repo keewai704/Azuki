@@ -96,10 +96,7 @@ pub fn find_candidate_window() -> Option<HWND> {
 pub fn configure_candidate_window(hwnd: HWND) {
     unsafe {
         let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32;
-        let new_ex_style = (ex_style
-            | WS_EX_NOACTIVATE.0
-            | WS_EX_TOOLWINDOW.0
-            | WS_EX_TOPMOST.0)
+        let new_ex_style = (ex_style | WS_EX_NOACTIVATE.0 | WS_EX_TOOLWINDOW.0 | WS_EX_TOPMOST.0)
             & !WS_EX_APPWINDOW.0;
         SetWindowLongPtrW(hwnd, GWL_EXSTYLE, new_ex_style as isize);
     }

@@ -22,9 +22,8 @@ pub fn run_ui() -> anyhow::Result<()> {
     windows_reactor::bootstrap()?;
     App::new().run_custom(move |_| {
         let root_state = state.clone();
-        let root: Box<dyn Component> = Box::new(move |_: &(), cx: &mut RenderCx| {
-            render_candidate_app(root_state.clone(), cx)
-        });
+        let root: Box<dyn Component> =
+            Box::new(move |_: &(), cx: &mut RenderCx| render_candidate_app(root_state.clone(), cx));
         let host = ReactorHost::new_with_window_options(
             CANDIDATE_WINDOW_TITLE,
             Some(windows_reactor::WindowSize {

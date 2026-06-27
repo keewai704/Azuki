@@ -115,5 +115,4 @@ mod tests {
 
         assert_eq!(position, WindowPoint::new(560, 126));
     }
-
 }
