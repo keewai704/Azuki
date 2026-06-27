@@ -149,6 +149,9 @@ jobs:
       - name: Check formatting
         run: cargo xtask fmt --check
 
+      - name: Test Rust workspace
+        run: cargo test --workspace
+
       - name: Build release installer
         run: cargo xtask build --release
 

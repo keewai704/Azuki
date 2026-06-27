@@ -192,6 +192,37 @@ mod tests {
     }
 
     #[test]
+    fn settings_pages_are_japanese_powertoys_style_pages() {
+        assert_eq!(
+            settings_pages()
+                .iter()
+                .map(|page| page.title)
+                .collect::<Vec<_>>(),
+            vec![
+                "ホーム",
+                "一般",
+                "入力",
+                "候補",
+                "Zenzai",
+                "デバッグ",
+                "情報",
+            ]
+        );
+
+        let all_text = settings_pages()
+            .iter()
+            .flat_map(|page| [page.title, page.description])
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        assert!(!all_text.contains("Rust"));
+        assert!(!all_text.contains("windows-rs"));
+        assert!(!all_text.contains("WinUI 3"));
+        assert!(!all_text.contains("繝"));
+        assert!(!all_text.contains("縺"));
+    }
+
+    #[test]
     fn settings_snapshot_reflects_config_values() {
         let mut config = shared::AppConfig::default();
         config.general.show_candidate_window_after_space = true;
@@ -242,5 +273,13 @@ mod tests {
         set_zenzai_backend_index(&mut config, 99);
 
         assert_eq!(config.zenzai.backend, "vulkan");
+    }
+
+    #[test]
+    fn ui_binaries_embed_azookey_icon_resource() {
+        let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+
+        assert!(manifest_dir.join("res/azookey.ico").is_file());
+        assert!(manifest_dir.join("res/ui.rc").is_file());
     }
 }
