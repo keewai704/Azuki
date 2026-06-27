@@ -1,0 +1,183 @@
+# azooKey for Windows
+
+> [!IMPORTANT]
+> このリポジトリは [fkunn1326/azooKey-Windows](https://github.com/fkunn1326/azooKey-Windows) からの fork です。
+
+[AzooKeyKanaKanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter)を利用したWindows版IMEです。
+
+> [!WARNING]
+> 現在開発中であるため、安定性や機能に関しては保証できません。使用する際は自己責任でお願いします。
+
+# インストール方法
+[Release](https://github.com/batao9/azooKey-Windows/releases)からazookey-setup.exeをダウンロードし、インストーラーを実行してください。
+こちらは [fkunn1326/azooKey-Windows](https://github.com/fkunn1326/azooKey-Windows) の fork ですので注意してください。
+
+# 機能
+
+- [x] ライブ変換
+- [x] ライブ変換中の読みを表示するルビ表示
+- [x] Zenzaiを使用したニューラルかな漢字変換
+- [x] 辞書登録機能（MVP）
+- [x] 英語キーボード向け変換オプションの設定
+- [x] 句読点確定
+
+# 設定
+
+## 全般設定
+
+### 基本設定
+- 句読点
+- 記号
+- スペースの入力
+- テンキーからの入力
+- ライブ変換中の読み表示 / 高さ調整
+
+### キー設定
+- ローマ字テーブル:
+  - 設定画面から Google IME 型の行テーブル（入力 / 出力 / 次の入力）を編集できます。
+  - `次の入力` により、`tt -> っ + t` のような継続入力ルールを設定できます。
+  - モーダルの「テーブルを初期化」はドラフトのみ更新し、`保存` で初めて反映されます。
+
+### 半角全角設定
+日本語入力時の文字幅はカテゴリごとに `半角 / 全角` を設定できます。
+
+### 変換の優先順位
+記号・句読点の変換は次の優先順位で適用されます。
+
+1. ローマ字テーブル（Google IME 型、`next_input` 対応）
+2. 基本設定（句読点 / 記号）と半角全角設定（カテゴリ設定）のフォールバック
+
+`z/` のような複合入力はローマ字テーブルを優先し、テーブル文脈に当たらない単体記号入力のみフォールバック設定を適用します。
+
+### 句読点確定
+基本設定の「句読点確定」を有効にすると、変換中に対象記号を入力した時点で現在の変換結果を確定し、続けて対象記号を入力します。対象は句読点、`！`、`？` から個別に選択できます。
+
+## 辞書
+
+- 設定画面の「辞書」から、`読み` と `単語` を追加・編集・削除できます。
+- MVPではインポート/エクスポートには未対応です。
+- 登録件数は最大 `50` 件です。
+- 本実装は動的ユーザ辞書方式です（静的 `user.louds*` は未対応）。
+
+### 入力モード切替ショートカット
+- `半角/全角`: 入力モード切り替え（英数/ひらがな）
+- `VK_IME_ON` (`0x16`): ひらがな入力へ切替
+- `VK_IME_OFF` (`0x1A`): 英数入力へ切替
+- 言語バーの `あ/A` アイコン:
+  - 左クリックで入力モードを切り替えます。
+  - 右クリックで設定画面を開けます。
+
+英語キーボードでは以下のショートカットも設定可能です。
+- `Ctrl + Space`: 入力モード切替（英数/ひらがなかな）
+- `` Alt + ` ``: 入力モード切替（英数/ひらがなかな）
+
+### 変換中ショートカット
+- `Ctrl + Enter`: 先頭文節のみを確定
+- `Ctrl + ↓`: 現在文節を確定して次文節へ移動
+- `Shift + ← / →`: 文節境界を前後に調整
+- `Shift + A〜Z`: 一時英字モードで未確定入力（確定操作または `Shift` 単独押下で解除）
+
+## Zenzai
+
+### 変換プロファイル
+設定で変換プロファイルを指定すると、プロファイルに応じた変換候補が表示されます。
+
+Zenzaiを有効にして、変換精度を向上させます。
+CPUバックエンドは AVX 対応 CPU が必要です。未対応環境では標準変換へ自動フォールバックします。
+
+### バックエンド
+以下の3種類のバックエンドをサポートしています。
+
+- **CPU**: 動作が非常に遅いため、非推奨です。AVX 対応 CPU が必要で、未対応環境では標準変換へフォールバックします。
+- **CUDA**: NvidiaのGPU専用。[CUDA Toolkit 12系](https://developer.nvidia.com/cuda-downloads)をインストールする必要があります。
+- **Vulkan**: GPUのドライバーに標準で含まれているため、追加のインストールは不要です。
+
+# コミュニティ
+
+## 開発を支援する
+- [GitHub Sponsors (Miwa)](https://github.com/sponsors/ensan-hcl): 変換エンジンの開発者
+- [Patreon (fkunn1326)](https://www.patreon.com/c/fkunn1326): Windowsに移植した人
+
+## 開発に参加する
+
+### 開発環境のセットアップ
+
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Swift for Windows](https://www.swift.org/install/windows/) (Swift 6.0以上)
+- [protoc](https://protobuf.dev/installation/)
+- [node.js](https://nodejs.org/en/download/)
+- [inno setup](https://jrsoftware.org/isinfo.php)
+
+### ビルド
+
+#### リポジトリのクローン
+```
+git clone https://github.com/fkunn1326/azookey-Windows --recursive
+```
+`--recursive`オプションを付けて、サブモジュールも一緒にクローンしてください。
+
+#### ビルド
+```
+cargo xtask build [--debug|--release]
+```
+`--debug`オプションを付けるとデバッグビルド、`--release`オプションを付けるとリリースビルドになります。省略時はデバッグビルドです。
+
+`build`フォルダーが作成され、ビルドされた実行ファイルが格納されます。
+
+候補ウィンドウ UI は `apps/Azookey.UI` の WinUI 3 アプリとして `ui.exe` に publish されます。設定 UI は `apps/Azookey.Settings` の WinUI 3 アプリとして `settings.exe` に publish されます。
+
+配布用インストーラーは Inno Setup で作成する `build/azookey-setup.exe` の 1 種類です。旧 Tauri/NSIS インストーラーは生成・同梱しません。`settings.exe` を含むアプリ本体、IME DLL、サーバー、UI、ランチャー、辞書、EngineRuntime は Inno installer が `{commonpf}\Azookey` に配置します。
+
+`launcher.exe`を管理者権限で実行すると、azookeyの変換エンジンが起動します。
+
+また、IMEを登録する際は以下のように`regsvr32.exe`を使用して登録する必要があります。
+```c
+regsvr32.exe "path/to/build/azookey_windows.dll" /s
+regsvr32.exe "path/to/build/x86/azookey_windows.dll" /s
+```
+逆に登録を解除する場合は`/u`オプションを付けて実行してください。
+
+#### 開発時のヒント
+- 開発は仮想マシンまたは専用のPCで行うことを推奨します。IMEがクラッシュするとWindowsがフリーズする可能性があります。
+- IMEを解除する際、IMEを使用中のアプリケーション（メモ帳など）を終了しないと、解除できないことがあります。
+
+### VMを使った開発
+
+Windows IME はホスト環境への影響が大きいため、VirtualBox 上にビルド用 VM と検証用 VM を用意して開発することを推奨します。
+
+- ビルド用 VM: Rust / Swift for Windows / Node.js / Inno Setup など、ビルドに必要なツールをインストールします。
+- 検証用 VM: インストーラーを実行し、IME の登録・入力・設定画面などを確認します。
+
+VM の名前、スナップショット名、SSH 接続先、鍵パスなどは環境ごとに異なるため、リポジトリには固定していません。`scripts/` のスクリプトを使う場合は `VM_NAME`、`SNAPSHOT_NAME`、`SSH_USER`、`SSH_PORT`、`SSH_KEY` などを環境変数で指定してください。`.local/` に同じ用途のスクリプトがある場合は、環境固有の設定が入っている可能性があるため `.local/` 側を優先して使います。
+
+代表的な実行例:
+
+```sh
+# ビルド用 VM でインストーラーを作成
+scripts/vm_build.sh <branch>
+
+# ビルド用 VM で client の composition 関連 test を実行
+scripts/vm_test_client_composition.sh <branch> [cargo-test-filter|skip] [swift-test-filter|all|skip]
+
+# 検証用 VM にインストーラーをサイレントインストール
+scripts/vm_stage_for_manual_test.sh <installer-path|latest>
+
+# インストール後にサイレントアンインストールまで確認
+UNINSTALL_AFTER_INSTALL=1 scripts/vm_stage_for_manual_test.sh <installer-path|latest>
+```
+
+検証用 VM はクリーンなスナップショットから起動し、インストールログを `.local/logs/` に回収します。`UNINSTALL_AFTER_INSTALL=1` を指定した場合はアンインストールログも回収します。手動確認を続ける場合は `SHUTDOWN_AFTER_INSTALL=0` を指定して、インストール後も VM を起動したままにできます。
+
+# 関連
+
+- [azooKey/azooKey](https://github.com/azooKey/azooKey): iOS / iPadOS向けの日本語キーボードアプリ
+- [7ka-Hiira/fcitx5-hazkey](https://github.com/7ka-Hiira/fcitx5-hazkey): fcitx5向けのLinux版azooKey
+- [azooKey/AzookeyKanakanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter): azooKeyの変換エンジン
+
+# 参考
+本プロジェクトの開発にあたり、以下のリソースを参考にしました。ありがとうございます！
+- [OMAMA-Taioan/khiin-rs](https://github.com/OMAMA-Taioan/khiin-rs/tree/master/windows)
+- [google/mozc](https://github.com/google/mozc/tree/master/src/win32/tip)
+- [microsoft/Windows-classic-samples](https://github.com/microsoft/Windows-classic-samples/tree/main/Samples/Win7Samples/winui/input/tsf/textservice)
+- [dec32/ajemi](https://github.com/dec32/ajemi)
+- https://zenn.dev/mkpoli/scraps/6dc57fcd0335cf

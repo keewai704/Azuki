@@ -1,0 +1,42 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { ThemeProvider } from "@/components/theme-provider"
+import { BrowserRouter, Routes, Route } from "react-router";
+import { AppSidebar } from "@/components/app-sidebar"
+
+import { General } from "@/pages/general"
+import { Appearance } from "@/pages/appearance"
+import { Zenzai } from "@/pages/zenzai"
+import { About } from "@/pages/about"
+import { Dictionary } from "@/pages/dictionary"
+import { Debug } from "@/pages/debug"
+import { Toaster } from "@/components/ui/sonner"
+import { showConfigStartupNoticeOnce, showUpdateInstallResultOnce } from "@/lib/config"
+
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+  <React.StrictMode>
+    <SidebarProvider>
+      <BrowserRouter>
+        <AppSidebar />
+        <main className="flex-1 min-w-0 p-6">
+          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+            <Routes>
+              <Route path="/" element={<General />} />
+              <Route path="/appearance" element={<Appearance />} />
+              <Route path="/zenzai" element={<Zenzai />} />
+              <Route path="/dictionary" element={<Dictionary />} />
+              <Route path="/debug" element={<Debug />} />
+              <Route path="/about" element={<About />} />
+            </Routes>
+            <Toaster />
+          </ThemeProvider>
+        </main>
+      </BrowserRouter>
+    </SidebarProvider>
+  </React.StrictMode>,
+);
+
+void showConfigStartupNoticeOnce();
+void showUpdateInstallResultOnce();

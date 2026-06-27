@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = [
+  "xtask",
+  "crates/client",
+  "crates/server",
+  "crates/shared",
+  "crates/macros",
+  "crates/launcher"
+]

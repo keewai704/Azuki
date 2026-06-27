@@ -1,0 +1,43 @@
+﻿<pages:SettingsPageBase
+    x:Class="Azookey.Settings.Pages.InfoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="using:Azookey.Settings.Pages"
+    xmlns:controls="using:Azookey.Settings.Controls">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Grid
+            MaxWidth="1040"
+            Padding="24,24,24,40"
+            HorizontalAlignment="Stretch">
+            <StackPanel Spacing="24">
+                <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="情報" />
+
+                <StackPanel Spacing="12">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="アプリ" />
+                    <controls:SettingsRow Description="現在のアプリ名です。" Header="アプリ名" Icon="&#xE80F;">
+                        <controls:SettingsRow.ActionContent>
+                            <TextBlock VerticalAlignment="Center" Text="azooKey for Windows" />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="現在のバージョンです。" Header="バージョン" Icon="&#xE946;">
+                        <controls:SettingsRow.ActionContent>
+                            <TextBlock x:ConnectionId='2' x:Name="versionTextBlock" VerticalAlignment="Center" />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                </StackPanel>
+
+                <StackPanel Spacing="12">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="コミュニティ" />
+                    <controls:SettingsRow Description="サポートとお知らせです。" Header="Discord" Icon="&#xE709;">
+                        <controls:SettingsRow.ActionContent>
+                            <HyperlinkButton
+                                Content="開く"
+                                NavigateUri="https://discord.com/invite/dY9gHuyZN5" />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</pages:SettingsPageBase>
+

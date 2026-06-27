@@ -1,0 +1,536 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {},
+    ".NETCoreApp,Version=v10.0/win-x64": {
+      "ui/1.0.0": {
+        "dependencies": {
+          "Azookey.Core": "1.0.0",
+          "Azookey.Protos": "1.0.0",
+          "Grpc.AspNetCore": "2.71.0",
+          "Microsoft.WindowsAppSDK": "2.2.0",
+          "Microsoft.Web.WebView2.Core.Projection": "1.0.3719.77",
+          "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.19041.57"
+        },
+        "runtime": {
+          "ui.dll": {}
+        }
+      },
+      "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.19041.57": {
+        "runtime": {
+          "Microsoft.Windows.SDK.NET.dll": {
+            "assemblyVersion": "10.0.19041.38",
+            "fileVersion": "10.0.19041.55"
+          },
+          "WinRT.Runtime.dll": {
+            "assemblyVersion": "2.2.0.0",
+            "fileVersion": "2.2.0.48161"
+          }
+        }
+      },
+      "Google.Protobuf/3.33.2": {
+        "runtime": {
+          "lib/net5.0/Google.Protobuf.dll": {
+            "assemblyVersion": "3.33.2.0",
+            "fileVersion": "3.33.2.0"
+          }
+        }
+      },
+      "Grpc.AspNetCore/2.71.0": {
+        "dependencies": {
+          "Google.Protobuf": "3.33.2",
+          "Grpc.AspNetCore.Server.ClientFactory": "2.71.0"
+        }
+      },
+      "Grpc.AspNetCore.Server/2.71.0": {
+        "dependencies": {
+          "Grpc.Net.Common": "2.71.0"
+        },
+        "runtime": {
+          "lib/net9.0/Grpc.AspNetCore.Server.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.71.0.0"
+          }
+        }
+      },
+      "Grpc.AspNetCore.Server.ClientFactory/2.71.0": {
+        "dependencies": {
+          "Grpc.AspNetCore.Server": "2.71.0",
+          "Grpc.Net.ClientFactory": "2.71.0"
+        },
+        "runtime": {
+          "lib/net9.0/Grpc.AspNetCore.Server.ClientFactory.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.71.0.0"
+          }
+        }
+      },
+      "Grpc.Core.Api/2.71.0": {
+        "runtime": {
+          "lib/netstandard2.1/Grpc.Core.Api.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.71.0.0"
+          }
+        }
+      },
+      "Grpc.Net.Client/2.71.0": {
+        "dependencies": {
+          "Grpc.Net.Common": "2.71.0"
+        },
+        "runtime": {
+          "lib/net8.0/Grpc.Net.Client.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.71.0.0"
+          }
+        }
+      },
+      "Grpc.Net.ClientFactory/2.71.0": {
+        "dependencies": {
+          "Grpc.Net.Client": "2.71.0"
+        },
+        "runtime": {
+          "lib/net8.0/Grpc.Net.ClientFactory.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.71.0.0"
+          }
+        }
+      },
+      "Grpc.Net.Common/2.71.0": {
+        "dependencies": {
+          "Grpc.Core.Api": "2.71.0"
+        },
+        "runtime": {
+          "lib/net8.0/Grpc.Net.Common.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.71.0.0"
+          }
+        }
+      },
+      "Microsoft.Web.WebView2/1.0.3719.77": {
+        "native": {
+          "runtimes/win-x64/native/WebView2Loader.dll": {
+            "fileVersion": "1.0.3719.77"
+          }
+        }
+      },
+      "Microsoft.Windows.AI.MachineLearning/2.1.70": {
+        "dependencies": {
+          "System.Numerics.Tensors": "9.0.0"
+        },
+        "runtime": {
+          "lib/net8.0-windows10.0.17763.0/Microsoft.ML.OnnxRuntime.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          },
+          "lib/net8.0-windows10.0.17763.0/Microsoft.Windows.AI.MachineLearning.Projection.dll": {
+            "assemblyVersion": "2.1.70.24056",
+            "fileVersion": "2.1.70.24056"
+          }
+        }
+      },
+      "Microsoft.WindowsAppSDK/2.2.0": {
+        "dependencies": {
+          "Microsoft.WindowsAppSDK.AI": "2.2.3",
+          "Microsoft.WindowsAppSDK.Foundation": "2.1.0",
+          "Microsoft.WindowsAppSDK.InteractiveExperiences": "2.0.15",
+          "Microsoft.WindowsAppSDK.ML": "2.1.70",
+          "Microsoft.WindowsAppSDK.Widgets": "2.0.5",
+          "Microsoft.WindowsAppSDK.WinUI": "2.2.1"
+        }
+      },
+      "Microsoft.WindowsAppSDK.AI/2.2.3": {
+        "dependencies": {
+          "Microsoft.WindowsAppSDK.Foundation": "2.1.0"
+        },
+        "runtime": {
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Graphics.Imaging.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AI.ContentSafety.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AI.Foundation.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AI.Imaging.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AI.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AI.Text.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AI.Video.Projection.dll": {
+            "assemblyVersion": "2.2.2.50153",
+            "fileVersion": "2.2.2.50153"
+          }
+        }
+      },
+      "Microsoft.WindowsAppSDK.Foundation/2.1.0": {
+        "dependencies": {
+          "Microsoft.WindowsAppSDK.InteractiveExperiences": "2.0.15"
+        },
+        "runtime": {
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Security.Authentication.OAuth.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AppLifecycle.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AppNotifications.Builder.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.AppNotifications.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.ApplicationModel.Background.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.ApplicationModel.DynamicDependency.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.ApplicationModel.Resources.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.BadgeNotifications.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Foundation.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Management.Deployment.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Media.Capture.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.PushNotifications.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Security.AccessControl.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Storage.Pickers.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Storage.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.System.Power.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.System.Projection.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          },
+          "lib/net6.0-windows10.0.17763.0/Microsoft.WindowsAppRuntime.Bootstrap.Net.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          }
+        },
+        "native": {
+          "runtimes/win-x64/native/Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.dll": {
+            "fileVersion": "2.0.0.0"
+          },
+          "runtimes/win-x64/native/Microsoft.WindowsAppRuntime.Bootstrap.dll": {
+            "fileVersion": "2.0.0.0"
+          }
+        }
+      },
+      "Microsoft.WindowsAppSDK.InteractiveExperiences/2.0.15": {
+        "runtime": {
+          "lib/net6.0-windows10.0.18362.0/Microsoft.InteractiveExperiences.Projection.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.27200.1024"
+          }
+        }
+      },
+      "Microsoft.WindowsAppSDK.ML/2.1.70": {
+        "dependencies": {
+          "Microsoft.Windows.AI.MachineLearning": "2.1.70",
+          "Microsoft.WindowsAppSDK.Foundation": "2.1.0"
+        }
+      },
+      "Microsoft.WindowsAppSDK.Widgets/2.0.5": {
+        "runtime": {
+          "lib/net6.0-windows10.0.17763.0/Microsoft.Windows.Widgets.Projection.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Microsoft.WindowsAppSDK.WinUI/2.2.1": {
+        "dependencies": {
+          "Microsoft.Web.WebView2": "1.0.3719.77",
+          "Microsoft.WindowsAppSDK.Foundation": "2.1.0",
+          "Microsoft.WindowsAppSDK.InteractiveExperiences": "2.0.15"
+        },
+        "runtime": {
+          "lib/net6.0-windows10.0.17763.0/Microsoft.WinUI.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.0.2606"
+          }
+        }
+      },
+      "System.CodeDom/10.0.0": {
+        "runtime": {
+          "lib/net10.0/System.CodeDom.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.52411"
+          }
+        }
+      },
+      "System.Management/10.0.0": {
+        "dependencies": {
+          "System.CodeDom": "10.0.0"
+        },
+        "runtime": {
+          "runtimes/win/lib/net10.0/System.Management.dll": {
+            "assemblyVersion": "10.0.0.0",
+            "fileVersion": "10.0.25.52411"
+          }
+        }
+      },
+      "System.Numerics.Tensors/9.0.0": {
+        "runtime": {
+          "lib/net9.0/System.Numerics.Tensors.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.24.52809"
+          }
+        }
+      },
+      "Azookey.Core/1.0.0": {
+        "dependencies": {
+          "Google.Protobuf": "3.33.2",
+          "Grpc.Net.Client": "2.71.0",
+          "System.Management": "10.0.0"
+        },
+        "runtime": {
+          "Azookey.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Azookey.Protos/1.0.0": {
+        "dependencies": {
+          "Google.Protobuf": "3.33.2",
+          "Grpc.AspNetCore": "2.71.0",
+          "Grpc.Net.Client": "2.71.0"
+        },
+        "runtime": {
+          "Azookey.Protos.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Microsoft.Web.WebView2.Core.Projection/1.0.3719.77": {
+        "runtime": {
+          "Microsoft.Web.WebView2.Core.Projection.dll": {
+            "assemblyVersion": "1.0.3719.77",
+            "fileVersion": "1.0.3719.77"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ui/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.19041.57": {
+      "type": "runtimepack",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Google.Protobuf/3.33.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vZXVbrZgBqUkP5iWQi0CS6pucIS2MQdEYPS1duWCo8fGrrt4th6HTiHfLFX2RmAWAQl1oUnzGgyDBsfq7fHQJA==",
+      "path": "google.protobuf/3.33.2",
+      "hashPath": "google.protobuf.3.33.2.nupkg.sha512"
+    },
+    "Grpc.AspNetCore/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-B4wAbNtAuHNiHAMxLFWL74wUElzNOOboFnypalqpX76piCOGz/w5FpilbVVYGboI4Qgl4ZmZsvDZ1zLwHNsjnw==",
+      "path": "grpc.aspnetcore/2.71.0",
+      "hashPath": "grpc.aspnetcore.2.71.0.nupkg.sha512"
+    },
+    "Grpc.AspNetCore.Server/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kv+9YVB6MqDYWIcstXvWrT7Xc1si/sfINzzSxvQfjC3aei+92gXDUXCH/Q+TEvi4QSICRqu92BYcrXUBW7cuOw==",
+      "path": "grpc.aspnetcore.server/2.71.0",
+      "hashPath": "grpc.aspnetcore.server.2.71.0.nupkg.sha512"
+    },
+    "Grpc.AspNetCore.Server.ClientFactory/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AHvMxoC+esO1e/nOYBjxvn0WDHAfglcVBjtkBy6ohgnV+PzkF8UdkPHE02xnyPFaSokWGZKnWzjgd00x6EZpyQ==",
+      "path": "grpc.aspnetcore.server.clientfactory/2.71.0",
+      "hashPath": "grpc.aspnetcore.server.clientfactory.2.71.0.nupkg.sha512"
+    },
+    "Grpc.Core.Api/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QquqUC37yxsDzd1QaDRsH2+uuznWPTS8CVE2Yzwl3CvU4geTNkolQXoVN812M2IwT6zpv3jsZRc9ExJFNFslTg==",
+      "path": "grpc.core.api/2.71.0",
+      "hashPath": "grpc.core.api.2.71.0.nupkg.sha512"
+    },
+    "Grpc.Net.Client/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-U1vr20r5ngoT9nlb7wejF28EKN+taMhJsV9XtK9MkiepTZwnKxxiarriiMfCHuDAfPUm9XUjFMn/RIuJ4YY61w==",
+      "path": "grpc.net.client/2.71.0",
+      "hashPath": "grpc.net.client.2.71.0.nupkg.sha512"
+    },
+    "Grpc.Net.ClientFactory/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8oPLwQLPo86fmcf9ghjCDyNsSWhtHc3CXa/AqwF8Su/pG7qAoeWWtbymsZhoNvCV9Zjzb6BDcIPKXLYt+O175g==",
+      "path": "grpc.net.clientfactory/2.71.0",
+      "hashPath": "grpc.net.clientfactory.2.71.0.nupkg.sha512"
+    },
+    "Grpc.Net.Common/2.71.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-v0c8R97TwRYwNXlC8GyRXwYTCNufpDfUtj9la+wUrZFzVWkFJuNAltU+c0yI3zu0jl54k7en6u2WKgZgd57r2Q==",
+      "path": "grpc.net.common/2.71.0",
+      "hashPath": "grpc.net.common.2.71.0.nupkg.sha512"
+    },
+    "Microsoft.Web.WebView2/1.0.3719.77": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-t+ucyKw5NTwMjsUrDF6R9Lk40lpcKQD1/HgyGFxl49tdA4h9dKlsj6FYGEmDRpFNfnTpENuTypMcdbrlkqBdDA==",
+      "path": "microsoft.web.webview2/1.0.3719.77",
+      "hashPath": "microsoft.web.webview2.1.0.3719.77.nupkg.sha512"
+    },
+    "Microsoft.Windows.AI.MachineLearning/2.1.70": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3Ft/INx7j/paN68bttIWGsVCs/DNJEWtjm460Z5vyxIEiWHdtBFRi+bBVlu322+r8oqN1GZtB3QDV9qoY1w7mg==",
+      "path": "microsoft.windows.ai.machinelearning/2.1.70",
+      "hashPath": "microsoft.windows.ai.machinelearning.2.1.70.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK/2.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kUgzkxWkqxUNpUwDU4mnNwlkDwSO8sO1SiUTFXD2YKW+SKTVB4rJjqmOLqMgBQbz4yfs+dLjmpeKXtV4Uf9c/Q==",
+      "path": "microsoft.windowsappsdk/2.2.0",
+      "hashPath": "microsoft.windowsappsdk.2.2.0.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK.AI/2.2.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-q3VpuZIoqUJfMmd6HWNJKanpSqG4REI0iWyGzcEXl4yU4w1jR06HOoubcPQCToxnlYKEU0SUExghzw5CBExD4A==",
+      "path": "microsoft.windowsappsdk.ai/2.2.3",
+      "hashPath": "microsoft.windowsappsdk.ai.2.2.3.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK.Foundation/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Urz1WrsXHYDHYrCPIWZlSTwgXwghEXlS6lY62Hk3vZE0GZ3hyYrMM7a+p6RrXC55GEgrRhOTRqXqcH2ZL/UWRA==",
+      "path": "microsoft.windowsappsdk.foundation/2.1.0",
+      "hashPath": "microsoft.windowsappsdk.foundation.2.1.0.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK.InteractiveExperiences/2.0.15": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-aQ9uzAIhTaN9zkclrtVg6kylpF+hESU+tC0bHarOCWdBz8ShZ7gt+gKwEmjKiqtPv6sRrRglyLLNVSPfb8KmMQ==",
+      "path": "microsoft.windowsappsdk.interactiveexperiences/2.0.15",
+      "hashPath": "microsoft.windowsappsdk.interactiveexperiences.2.0.15.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK.ML/2.1.70": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Okbb/lBv2YBDH6bjhrMCQBANsopvZJjdu+ZFNVcx5LafM+dsjEVFBnPkakmA/rwRbuP+N4q/GYoKH60uwH9jRA==",
+      "path": "microsoft.windowsappsdk.ml/2.1.70",
+      "hashPath": "microsoft.windowsappsdk.ml.2.1.70.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK.Widgets/2.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-lRz+8+QU65gV8hRzLVE+GRsPKZ42lnzqkmsw96HzQd/DuFYfr4JYpUU7ZZ5YrkV2EfQe4BCmoRKAeZ3WwalMcg==",
+      "path": "microsoft.windowsappsdk.widgets/2.0.5",
+      "hashPath": "microsoft.windowsappsdk.widgets.2.0.5.nupkg.sha512"
+    },
+    "Microsoft.WindowsAppSDK.WinUI/2.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-w8KuqJB7IphDRXAGNVuRq+oGeoGycc4ZAraA+OIpsGm/boEKHLkwXmzNDaNrVlnsDpjxQFWE2XVp0hXjlWJqxw==",
+      "path": "microsoft.windowsappsdk.winui/2.2.1",
+      "hashPath": "microsoft.windowsappsdk.winui.2.2.1.nupkg.sha512"
+    },
+    "System.CodeDom/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-QWERdKi/tQAx+MbrPxTGcpchqMANnVXNiv2r2tILBBB38E74buD+fABSUhozZ1G9kjbadFB0m+HPFMkhJPeFvA==",
+      "path": "system.codedom/10.0.0",
+      "hashPath": "system.codedom.10.0.0.nupkg.sha512"
+    },
+    "System.Management/10.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-LE3rDZoPzulou78Tsq+3ALhUs4vatQ03v2QWbYVIenVPneUH/+LTUmHyyl098OxIFLQI6sNkZs8YHbUnT/sm3A==",
+      "path": "system.management/10.0.0",
+      "hashPath": "system.management.10.0.0.nupkg.sha512"
+    },
+    "System.Numerics.Tensors/9.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hyJB4UlpAi19Xr9AXzu2NuagKC4lPfHObNMEAA0HmqFz2rX7wKgzeYzO/jM/eBHDhnUGFFEjk5cOoJaxqg5J4A==",
+      "path": "system.numerics.tensors/9.0.0",
+      "hashPath": "system.numerics.tensors.9.0.0.nupkg.sha512"
+    },
+    "Azookey.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Azookey.Protos/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Web.WebView2.Core.Projection/1.0.3719.77": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

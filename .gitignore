@@ -1,0 +1,15 @@
+target
+build
+scripts/*.exe
+logs/*
+.local/
+.idea
+
+*.gguf
+*.dll
+*.lib
+llama_cpu/
+llama_cuda/
+llama_vulkan/
+.codex
+.worktrees/

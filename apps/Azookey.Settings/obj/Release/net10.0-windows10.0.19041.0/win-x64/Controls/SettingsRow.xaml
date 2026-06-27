@@ -1,0 +1,51 @@
+﻿<UserControl x:ConnectionId='1'
+    x:Class="Azookey.Settings.Controls.SettingsRow"
+    x:Name="Root"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border
+        Padding="16"
+        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="8">
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border
+                Width="32"
+                Height="32"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                CornerRadius="16">
+                <FontIcon x:ConnectionId='5'
+                    x:Name="IconPresenter"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                       />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock x:ConnectionId='3'
+                    x:Name="HeaderText"
+                    Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                                        />
+                <TextBlock x:ConnectionId='4'
+                    x:Name="DescriptionText"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                            
+                    TextWrapping="Wrap" />
+            </StackPanel>
+            <ContentPresenter x:ConnectionId='2'
+                x:Name="ActionPresenter"
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                                                              />
+        </Grid>
+    </Border>
+</UserControl>
+

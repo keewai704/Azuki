@@ -1,0 +1,142 @@
+﻿<pages:SettingsPageBase
+    x:Class="Azookey.Settings.Pages.GeneralPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:pages="using:Azookey.Settings.Pages"
+    xmlns:controls="using:Azookey.Settings.Controls">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Grid
+            MaxWidth="1040"
+            Padding="24,24,24,40"
+            HorizontalAlignment="Stretch">
+            <StackPanel Spacing="24">
+                <TextBlock Style="{ThemeResource TitleTextBlockStyle}" Text="一般" />
+
+                <StackPanel Spacing="12">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="変換の確定" />
+                    <controls:SettingsRow Description="句読点や感嘆符、疑問符の入力で変換を確定します。" Header="句読点で確定" Icon="&#xE8C8;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='23' x:Name="punctuationCommitSwitch"                                  />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="句読点の入力で確定します。" Header="句読点" Icon="&#xE8C8;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='22' x:Name="punctuationCommitPunctuationSwitch"                                  />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="感嘆符の入力で確定します。" Header="感嘆符" Icon="&#xE8C8;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='21' x:Name="punctuationCommitExclamationSwitch"                                  />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="疑問符の入力で確定します。" Header="疑問符" Icon="&#xE8C8;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='20' x:Name="punctuationCommitQuestionSwitch"                                  />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                </StackPanel>
+
+                <StackPanel Spacing="12">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="文字幅" />
+                    <controls:SettingsRow Description="英字の既定の幅です。" Header="アルファベット" Icon="&#xE8A5;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='19' x:Name="alphabetWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="数字の既定の幅です。" Header="数字" Icon="&#xE8EF;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='18' x:Name="numberWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="かっこの既定の幅です。" Header="かっこ" Icon="&#xE8A7;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='17' x:Name="bracketWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="カンマとピリオドの幅です。" Header="カンマとピリオド" Icon="&#xE8F2;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='16' x:Name="commaPeriodWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="中点とかぎかっこの幅です。" Header="中点とかぎかっこ" Icon="&#xE8A7;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='15' x:Name="middleDotCornerBracketWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="引用符の幅です。" Header="引用符" Icon="&#xE8A7;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='14' x:Name="quoteWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="コロンとセミコロンの幅です。" Header="コロンとセミコロン" Icon="&#xE70B;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='13' x:Name="colonSemicolonWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="# などの記号の幅です。" Header="# などの記号" Icon="&#xE8FD;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='12' x:Name="hashGroupWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="チルダの幅です。" Header="チルダ" Icon="&#xE7C3;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='11' x:Name="tildeWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="数式記号の幅です。" Header="数式記号" Icon="&#xE8EF;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='10' x:Name="mathSymbolWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="疑問符と感嘆符の幅です。" Header="疑問符と感嘆符" Icon="&#xE8C8;">
+                        <controls:SettingsRow.ActionContent>
+                            <ComboBox x:ConnectionId='9' x:Name="questionExclamationWidthBox" MinWidth="160"                                                     />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                </StackPanel>
+
+                <StackPanel Spacing="12">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="ショートカット" />
+                    <controls:SettingsRow Description="コントロール + スペース で入力モードを切り替えます。" Header="コントロール + スペース" Icon="&#xE765;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='8' x:Name="ctrlSpaceToggleSwitch"                             />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="オルト + バッククォート で入力モードを切り替えます。" Header="オルト + バッククォート" Icon="&#xE765;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='7' x:Name="altBackquoteToggleSwitch"                             />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Description="英数キーで入力モードを切り替えます。" Header="英数キー" Icon="&#xE765;">
+                        <controls:SettingsRow.ActionContent>
+                            <ToggleSwitch x:ConnectionId='6' x:Name="eisuToggleSwitch"                             />
+                        </controls:SettingsRow.ActionContent>
+                    </controls:SettingsRow>
+                </StackPanel>
+
+                <StackPanel Spacing="12">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="ローマ字ルール" />
+                    <Border
+                        Padding="16"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Spacing="16">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:ConnectionId='3'                              Content="追加" />
+                                <Button x:ConnectionId='4'                               Content="編集" />
+                                <Button x:ConnectionId='5'                                 Content="削除" />
+                            </StackPanel>
+                            <ListView x:ConnectionId='2'
+                                x:Name="romajiRowsList"
+                                MaxHeight="360"
+                                SelectionMode="Single" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</pages:SettingsPageBase>
+
