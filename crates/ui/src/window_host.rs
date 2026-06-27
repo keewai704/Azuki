@@ -85,7 +85,7 @@ pub fn candidate_popup_plan(
 
 pub fn find_candidate_window() -> Option<HWND> {
     let title = wide_null(CANDIDATE_WINDOW_TITLE);
-    unsafe { FindWindowW(None, PCWSTR(title.as_ptr())).ok() }.filter(|hwnd| hwnd.0 != 0)
+    unsafe { FindWindowW(None, PCWSTR(title.as_ptr())).ok() }.filter(|hwnd| !hwnd.0.is_null())
 }
 
 pub fn configure_candidate_window(hwnd: HWND) {
