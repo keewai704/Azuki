@@ -64,7 +64,7 @@ jobs:
         with:
           swift-version: ${{ env.SWIFT_VERSION }}
           swift-build: ${{ env.SWIFT_BUILD }}
-          cache: true
+          cache: false
 
       - name: Fix Swift SDK modulemap
         run: |
