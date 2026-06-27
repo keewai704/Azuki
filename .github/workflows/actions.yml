@@ -18,6 +18,7 @@ env:
   CARGO_TERM_COLOR: always
   SWIFT_VERSION: swift-6.1.2-release
   SWIFT_BUILD: 6.1.2-RELEASE
+  PROTOC_VERSION: 35.1
   LLAMA_RELEASE_VERSION: b4846
   LLAMA_VULKAN_URL: https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-vulkan-x64.zip
 
@@ -33,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -43,14 +44,17 @@ jobs:
           targets: i686-pc-windows-msvc
 
       - name: Cache Rust
-        uses: Swatinem/rust-cache@v2
+        uses: actions/cache@v6
         with:
-          cache-bin: true
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/git/db
+            ~/.cargo/registry/cache
+            ~/.cargo/registry/index
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       - name: Install Inno Setup
         run: choco install innosetup --yes --no-progress
@@ -73,13 +77,20 @@ jobs:
           $modulemap.files.'ucrt.modulemap'.content | Set-Content -LiteralPath $destination -NoNewline -Encoding utf8
 
       - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $zip = Join-Path $env:RUNNER_TEMP "protoc-${{ env.PROTOC_VERSION }}-win64.zip"
+          $destination = Join-Path $env:RUNNER_TEMP "protoc"
+          Invoke-WebRequest `
+            -Uri "https://github.com/protocolbuffers/protobuf/releases/download/v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}-win64.zip" `
+            -OutFile $zip
+          New-Item -Path $destination -ItemType Directory -Force | Out-Null
+          Expand-Archive -Path $zip -DestinationPath $destination -Force
+          "$destination\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          & "$destination\bin\protoc.exe" --version
 
       - name: Cache external native assets
         id: cache-native-assets
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             llama_vulkan
@@ -120,7 +131,7 @@ jobs:
           "$($hash.Hash.ToLowerInvariant())  azookey-setup.exe" | Set-Content -LiteralPath "build\azookey-setup.exe.sha256" -NoNewline -Encoding ascii
 
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: azookey-setup
           path: |
