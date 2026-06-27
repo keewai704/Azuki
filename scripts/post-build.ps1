@@ -10,7 +10,6 @@ New-Item -ItemType Directory -Force build/x86 | Out-Null
 $engineRuntime = Join-Path "build" "EngineRuntime"
 $swiftRuntime = Join-Path $engineRuntime "Swift"
 Remove-Item -LiteralPath $engineRuntime -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item -LiteralPath "build/llama_cpu" -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath "build/llama_vulkan" -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force $swiftRuntime | Out-Null
 $rootRuntimePatterns = @(
@@ -37,7 +36,6 @@ Copy-Item target/i686-pc-windows-msvc/$Profile/azookey_windows.dll build/x86 -Fo
 
 Copy-Item server-swift/.build/x86_64-unknown-windows-msvc/release/azookey-server.dll $swiftRuntime -Force
 
-Copy-Item -Recurse -Force llama_cpu (Join-Path $engineRuntime "llama_cpu")
 Copy-Item -Recurse -Force llama_vulkan (Join-Path $engineRuntime "llama_vulkan")
 
 Copy-Item $env:APPDATA/../Local/Programs/Swift/Runtimes/*/usr/bin/* $swiftRuntime -Force

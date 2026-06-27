@@ -36,6 +36,14 @@ fn run_step(repo: &Path, step: Step) -> Result<()> {
         }
         Step::SyncVersion => run_command(repo, "node", ["scripts/sync-version.mjs"]),
         Step::BuildSwift => {
+            let source = repo.join("llama_vulkan/llama.lib");
+            anyhow::ensure!(
+                source.is_file(),
+                "Vulkan llama.lib was not found at {}",
+                source.display()
+            );
+            std::fs::copy(&source, repo.join("server-swift/llama.lib"))
+                .context("failed to prepare server-swift/llama.lib from Vulkan assets")?;
             run_command(
                 &repo.join("server-swift"),
                 "swift",
@@ -83,8 +91,8 @@ fn run_step(repo: &Path, step: Step) -> Result<()> {
             }
             run_command(repo, "cargo", args)
         }
-        Step::BuildWinui => {
-            run_powershell_script(repo, "scripts/build-winui.ps1", std::iter::empty::<&str>())
+        Step::BuildUi => {
+            run_powershell_script(repo, "scripts/build-ui.ps1", std::iter::empty::<&str>())
         }
         Step::PostBuild(profile) => run_powershell_script(
             repo,

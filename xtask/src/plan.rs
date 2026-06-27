@@ -27,7 +27,7 @@ pub enum Step {
     BuildSwift,
     BuildX64(Profile),
     BuildX86(Profile),
-    BuildWinui,
+    BuildUi,
     PostBuild(Profile),
     BuildInstaller,
 }

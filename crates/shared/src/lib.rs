@@ -437,24 +437,18 @@ pub fn get_default_romaji_rows() -> Vec<RomajiRule> {
     default_romaji_rows()
 }
 
-pub fn zenzai_cpu_backend_supported() -> bool {
-    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-    {
-        std::is_x86_feature_detected!("avx")
-    }
+pub const ZENZAI_BACKEND_VULKAN: &str = "vulkan";
 
-    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
-    {
-        false
-    }
+pub fn normalize_zenzai_backend(_backend: &str) -> String {
+    ZENZAI_BACKEND_VULKAN.to_string()
 }
 
 #[cfg(test)]
 mod tests {
     use super::{
-        zenzai_models, AppConfig, ConfigError, DebugConfig, GeneralConfig, NumpadInputMode,
-        ShortcutConfig, CONFIG_VERSION, LIVE_CONVERSION_READING_VERTICAL_ADJUSTMENT_DEFAULT,
-        SETTINGS_FILENAME,
+        parse_config, zenzai_models, AppConfig, ConfigError, DebugConfig, GeneralConfig,
+        NumpadInputMode, ShortcutConfig, CONFIG_VERSION,
+        LIVE_CONVERSION_READING_VERTICAL_ADJUSTMENT_DEFAULT, SETTINGS_FILENAME,
     };
     use std::{
         env,
@@ -583,6 +577,13 @@ mod tests {
     }
 
     #[test]
+    fn default_config_uses_vulkan_zenzai_backend() {
+        let config = AppConfig::default();
+
+        assert_eq!(config.zenzai.backend, "vulkan");
+    }
+
+    #[test]
     fn missing_zenzai_model_id_uses_default() {
         let json = r#"{
         "version": "0.1.2",
@@ -595,6 +596,18 @@ mod tests {
             config.zenzai.model_id,
             zenzai_models::DEFAULT_ZENZAI_MODEL_ID
         );
+    }
+
+    #[test]
+    fn legacy_cpu_zenzai_backend_is_migrated_to_vulkan() {
+        let json = r#"{
+        "version": "0.1.2",
+        "zenzai": { "enable": true, "profile": "", "backend": "cpu" }
+    }"#;
+
+        let config = parse_config(Path::new("settings.json"), json).unwrap();
+
+        assert_eq!(config.zenzai.backend, "vulkan");
     }
 
     #[test]
@@ -994,7 +1007,7 @@ impl Default for AppConfig {
             zenzai: ZenzaiConfig {
                 enable: false,
                 profile: "".to_string(),
-                backend: "cpu".to_string(),
+                backend: ZENZAI_BACKEND_VULKAN.to_string(),
                 model_id: zenzai_models::default_model_id(),
             },
             shortcuts: ShortcutConfig::default(),
@@ -1135,6 +1148,7 @@ fn parse_config(config_path: &Path, config_str: &str) -> Result<AppConfig, Confi
     }
 
     repair_mojibake_default_romaji_table(&mut config);
+    config.zenzai.backend = normalize_zenzai_backend(&config.zenzai.backend);
 
     Ok(config)
 }

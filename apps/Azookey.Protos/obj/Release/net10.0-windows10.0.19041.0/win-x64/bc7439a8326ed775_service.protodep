@@ -1,2 +1,0 @@
-obj\Release\net10.0-windows10.0.19041.0\win-x64/Service.cs \
-obj\Release\net10.0-windows10.0.19041.0\win-x64/ServiceGrpc.cs: ../../crates/shared/service.proto

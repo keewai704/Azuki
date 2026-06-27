@@ -1,72 +1,41 @@
+use std::sync::{Arc, Mutex};
+
+use crate::{CandidateState, WindowAction, WindowRect};
 use shared::proto::{
     window_service_server::WindowService as WindowServiceProto, EmptyResponse, SetCandidateRequest,
     SetInputModeRequest, SetPositionRequest, SetSelectionRequest, UpdateCandidateWindowRequest,
+    WindowPosition,
 };
-use tokio::sync::mpsc;
 use tonic::{Request, Response, Status};
 
-#[derive(Debug, Clone)]
-pub struct WindowController {
-    sender: mpsc::Sender<WindowAction>,
+#[derive(Clone, Debug, Default)]
+pub struct SharedCandidateState {
+    state: Arc<Mutex<CandidateState>>,
 }
 
-impl WindowController {
-    pub fn new(sender: mpsc::Sender<WindowAction>) -> Self {
-        Self { sender }
+impl SharedCandidateState {
+    pub fn snapshot(&self) -> CandidateState {
+        self.state.lock().expect("candidate state poisoned").clone()
+    }
+
+    fn apply(&self, action: WindowAction) {
+        let mut state = self.state.lock().expect("candidate state poisoned");
+        *state = state.clone().apply(action);
     }
 }
 
-// ウィンドウ操作コマンド
-#[derive(Debug, serde::Serialize)]
-pub enum WindowAction {
-    Show,
-    Hide,
-    SetPosition {
-        top: i32,
-        left: i32,
-        bottom: i32,
-        right: i32,
-    },
-    SetSelection {
-        index: i32,
-    },
-    SetCandidate {
-        candidates: Vec<String>,
-    },
-    SetInputMode(String),
-    UpdateCandidateWindow {
-        visible: Option<bool>,
-        position: Option<WindowPositionAction>,
-        candidates: Option<Vec<String>>,
-        selected_index: Option<i32>,
-        input_mode: Option<String>,
-        reading: Option<String>,
-        candidate_list_visible: Option<bool>,
-        reading_vertical_adjustment: Option<i32>,
-    },
-}
-
-#[derive(Debug, serde::Serialize)]
-pub struct WindowPositionAction {
-    pub top: i32,
-    pub left: i32,
-    pub bottom: i32,
-    pub right: i32,
-}
-
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct WindowService {
-    pub controller: WindowController,
+    state: SharedCandidateState,
 }
 
 impl WindowService {
-    async fn send_action(&self, action: WindowAction) -> Result<Response<EmptyResponse>, Status> {
-        self.controller
-            .sender
-            .send(action)
-            .await
-            .map_err(|_| Status::internal("window event channel is closed"))?;
+    pub fn new(state: SharedCandidateState) -> Self {
+        Self { state }
+    }
 
+    async fn send_action(&self, action: WindowAction) -> Result<Response<EmptyResponse>, Status> {
+        self.state.apply(action);
         Ok(Response::new(EmptyResponse {}))
     }
 }
@@ -86,6 +55,7 @@ impl WindowServiceProto for WindowService {
     ) -> Result<Response<EmptyResponse>, Status> {
         self.send_action(WindowAction::Hide).await
     }
+
     async fn set_window_position(
         &self,
         request: Request<SetPositionRequest>,
@@ -94,196 +64,99 @@ impl WindowServiceProto for WindowService {
             .into_inner()
             .position
             .ok_or_else(|| Status::invalid_argument("position is required"))?;
-        let top = position.top;
-        let left = position.left;
-        let bottom = position.bottom;
-        let right = position.right;
-        self.send_action(WindowAction::SetPosition {
-            top,
-            left,
-            bottom,
-            right,
-        })
-        .await
+        self.send_action(WindowAction::SetPosition(rect_from_proto(position)))
+            .await
     }
 
     async fn set_candidate(
         &self,
         request: Request<SetCandidateRequest>,
     ) -> Result<Response<EmptyResponse>, Status> {
-        let candidate = request.into_inner().candidates;
-
-        self.send_action(WindowAction::SetCandidate {
-            candidates: candidate,
-        })
-        .await
+        self.send_action(WindowAction::SetCandidate(request.into_inner().candidates))
+            .await
     }
 
     async fn set_selection(
         &self,
         request: Request<SetSelectionRequest>,
     ) -> Result<Response<EmptyResponse>, Status> {
-        let index = request.into_inner().index;
-        self.send_action(WindowAction::SetSelection { index }).await
+        self.send_action(WindowAction::SetSelection(request.into_inner().index))
+            .await
     }
 
     async fn set_input_mode(
         &self,
         request: Request<SetInputModeRequest>,
     ) -> Result<Response<EmptyResponse>, Status> {
-        let mode = request.into_inner().mode;
-        self.send_action(WindowAction::SetInputMode(mode)).await
+        self.send_action(WindowAction::SetInputMode(request.into_inner().mode))
+            .await
     }
 
     async fn update_candidate_window(
         &self,
         request: Request<UpdateCandidateWindowRequest>,
     ) -> Result<Response<EmptyResponse>, Status> {
-        let request = request.into_inner();
-        let position = request.position.map(|position| WindowPositionAction {
-            top: position.top,
-            left: position.left,
-            bottom: position.bottom,
-            right: position.right,
-        });
-        let candidates = request
-            .candidates
-            .map(|candidate_list| candidate_list.candidates);
-
-        self.send_action(WindowAction::UpdateCandidateWindow {
-            visible: request.visible,
-            position,
-            candidates,
-            selected_index: request.selected_index,
-            input_mode: request.input_mode,
-            reading: request.reading,
-            candidate_list_visible: request.candidate_list_visible,
-            reading_vertical_adjustment: request.reading_vertical_adjustment,
-        })
-        .await
+        self.send_action(action_from_update_request(request.into_inner()))
+            .await
     }
+}
+
+pub fn action_from_update_request(request: UpdateCandidateWindowRequest) -> WindowAction {
+    WindowAction::UpdateCandidateWindow {
+        visible: request.visible,
+        position: request.position.map(rect_from_proto),
+        candidates: request
+            .candidates
+            .map(|candidate_list| candidate_list.candidates),
+        selected_index: request.selected_index,
+        input_mode: request.input_mode,
+        reading: request.reading,
+        candidate_list_visible: request.candidate_list_visible,
+        reading_vertical_adjustment: request.reading_vertical_adjustment,
+    }
+}
+
+fn rect_from_proto(position: WindowPosition) -> WindowRect {
+    WindowRect::new(position.top, position.left, position.bottom, position.right)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use shared::proto::WindowPosition;
-    use tonic::Code;
+    use shared::proto::{UpdateCandidateWindowRequest, WindowPosition};
 
-    fn service_with_receiver() -> (WindowService, mpsc::Receiver<WindowAction>) {
-        let (sender, receiver) = mpsc::channel(1);
-        (
-            WindowService {
-                controller: WindowController::new(sender),
-            },
-            receiver,
-        )
-    }
+    #[test]
+    fn batched_proto_request_maps_optional_fields_to_action() {
+        let action = action_from_update_request(UpdateCandidateWindowRequest {
+            visible: Some(true),
+            position: Some(WindowPosition {
+                top: 1,
+                left: 2,
+                bottom: 3,
+                right: 4,
+            }),
+            candidates: Some(shared::proto::CandidateList {
+                candidates: vec!["候補".to_string()],
+            }),
+            selected_index: Some(0),
+            input_mode: Some("あ".to_string()),
+            reading: Some("よみ".to_string()),
+            candidate_list_visible: Some(true),
+            reading_vertical_adjustment: Some(4),
+        });
 
-    #[tokio::test]
-    async fn set_window_position_without_position_returns_invalid_argument() {
-        let (service, _receiver) = service_with_receiver();
-
-        let error = service
-            .set_window_position(Request::new(SetPositionRequest { position: None }))
-            .await
-            .expect_err("missing position should be rejected");
-
-        assert_eq!(error.code(), Code::InvalidArgument);
-    }
-
-    #[tokio::test]
-    async fn set_window_position_sends_action() {
-        let (service, mut receiver) = service_with_receiver();
-
-        service
-            .set_window_position(Request::new(SetPositionRequest {
-                position: Some(WindowPosition {
-                    top: 1,
-                    left: 2,
-                    bottom: 3,
-                    right: 4,
-                }),
-            }))
-            .await
-            .expect("valid position should be sent");
-
-        match receiver.recv().await.expect("action should be queued") {
-            WindowAction::SetPosition {
-                top,
-                left,
-                bottom,
-                right,
-            } => {
-                assert_eq!((top, left, bottom, right), (1, 2, 3, 4));
-            }
-            action => panic!("unexpected action: {action:?}"),
-        }
-    }
-
-    #[tokio::test]
-    async fn update_candidate_window_sends_batched_action() {
-        let (service, mut receiver) = service_with_receiver();
-
-        service
-            .update_candidate_window(Request::new(UpdateCandidateWindowRequest {
+        assert_eq!(
+            action,
+            WindowAction::UpdateCandidateWindow {
                 visible: Some(true),
-                position: Some(WindowPosition {
-                    top: 1,
-                    left: 2,
-                    bottom: 3,
-                    right: 4,
-                }),
-                candidates: Some(shared::proto::CandidateList {
-                    candidates: vec!["候補".to_string()],
-                }),
+                position: Some(WindowRect::new(1, 2, 3, 4)),
+                candidates: Some(vec!["候補".to_string()]),
                 selected_index: Some(0),
                 input_mode: Some("あ".to_string()),
-                reading: Some("こうほ".to_string()),
+                reading: Some("よみ".to_string()),
                 candidate_list_visible: Some(true),
                 reading_vertical_adjustment: Some(4),
-            }))
-            .await
-            .expect("batched update should be sent");
-
-        match receiver.recv().await.expect("action should be queued") {
-            WindowAction::UpdateCandidateWindow {
-                visible,
-                position,
-                candidates,
-                selected_index,
-                input_mode,
-                reading,
-                candidate_list_visible,
-                reading_vertical_adjustment,
-            } => {
-                assert_eq!(visible, Some(true));
-                let position = position.expect("position should be included");
-                assert_eq!(
-                    (position.top, position.left, position.bottom, position.right),
-                    (1, 2, 3, 4)
-                );
-                assert_eq!(candidates, Some(vec!["候補".to_string()]));
-                assert_eq!(selected_index, Some(0));
-                assert_eq!(input_mode, Some("あ".to_string()));
-                assert_eq!(reading, Some("こうほ".to_string()));
-                assert_eq!(candidate_list_visible, Some(true));
-                assert_eq!(reading_vertical_adjustment, Some(4));
             }
-            action => panic!("unexpected action: {action:?}"),
-        }
-    }
-
-    #[tokio::test]
-    async fn closed_channel_returns_internal_status() {
-        let (service, receiver) = service_with_receiver();
-        drop(receiver);
-
-        let error = service
-            .show_window(Request::new(EmptyResponse {}))
-            .await
-            .expect_err("closed channel should be reported as a gRPC error");
-
-        assert_eq!(error.code(), Code::Internal);
+        );
     }
 }

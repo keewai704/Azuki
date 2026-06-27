@@ -19,7 +19,6 @@ env:
   SWIFT_VERSION: swift-6.1.2-release
   SWIFT_BUILD: 6.1.2-RELEASE
   LLAMA_RELEASE_VERSION: b4846
-  LLAMA_CPU_URL: https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-avx-x64.zip
   LLAMA_VULKAN_URL: https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-vulkan-x64.zip
 
 jobs:
@@ -47,11 +46,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-bin: true
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -88,7 +82,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            llama_cpu
             llama_vulkan
           key: ${{ runner.os }}-llama-${{ env.LLAMA_RELEASE_VERSION }}-${{ hashFiles('.github/workflows/actions.yml') }}
           restore-keys: |
@@ -110,11 +103,10 @@ jobs:
             Remove-Item $tempZip -Force
           }
 
-          Download-Extract -Url "${{ env.LLAMA_CPU_URL }}" -Destination "llama_cpu"
           Download-Extract -Url "${{ env.LLAMA_VULKAN_URL }}" -Destination "llama_vulkan"
 
       - name: Prepare Swift native library
-        run: Copy-Item "llama_cpu\llama.lib" -Destination "server-swift\" -Force
+        run: Copy-Item "llama_vulkan\llama.lib" -Destination "server-swift\" -Force
 
       - name: Check formatting
         run: cargo xtask fmt --check

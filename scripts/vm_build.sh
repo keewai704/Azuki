@@ -313,7 +313,6 @@ create_archive() {
     --exclude-vcs \
     --exclude='./target' \
     --exclude='./build' \
-    --exclude='./frontend/node_modules' \
     --exclude='./.local' \
     --exclude='./logs' \
     .
@@ -332,16 +331,14 @@ param(
 $ErrorActionPreference = "Stop"
 $env:Path += ";$env:USERPROFILE\\.cargo\\bin"
 
-$LLAMA_CPU_URL = "https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-avx-x64.zip"
 $LLAMA_VULKAN_URL = "https://github.com/fkunn1326/llama.cpp/releases/download/b4846/llama-b4846-bin-win-vulkan-x64.zip"
-$downloadAllAssets = $env:DOWNLOAD_ALL_ASSETS -eq "1"
 $cacheRoot = "C:\work\azooKey-Windows"
 
 function Sync-GuestClock {
   param([string]$TimestampUtc)
 
   try {
-    # GitHub/Tauri tool downloads can fail with NotValidYet if the restored VM clock
+    # GitHub/tool downloads can fail with NotValidYet if the restored VM clock
     # is behind the host or the certificate validity window has just rolled.
     # Keep a wide safety margin for local VM builds so snapshot restore time skew does not block bundling.
     $targetUtc = [DateTime]::Parse($TimestampUtc).ToUniversalTime().AddHours(12)
@@ -413,41 +410,20 @@ Set-Location $SourceDir
 Write-Host "source extracted: $SourceDir"
 Sync-GuestClock -TimestampUtc $HostTimestampUtc
 
-$llamaCpuDir = Join-Path $SourceDir "llama_cpu"
 $llamaVulkanDir = Join-Path $SourceDir "llama_vulkan"
 $emojiDictDir = Join-Path $SourceDir "server-swift\\azooKey_emoji_dictionary_storage\\EmojiDictionary"
 $mainDictDir = Join-Path $SourceDir "server-swift\\azooKey_dictionary_storage\\Dictionary"
 
-if (!(Test-Path (Join-Path $llamaCpuDir "llama.lib"))) {
-  if (Copy-TreeIfExists -SourceDir (Join-Path $cacheRoot "llama_cpu") -DestDir $llamaCpuDir) {
-    Write-Host "reused llama cpu assets from cache"
+if (!(Test-Path (Join-Path $llamaVulkanDir "llama.lib")) -or !(Test-Path (Join-Path $llamaVulkanDir "llama.dll"))) {
+  if (Copy-TreeIfExists -SourceDir (Join-Path $cacheRoot "llama_vulkan") -DestDir $llamaVulkanDir) {
+    Write-Host "reused llama vulkan assets from cache"
   } else {
-    Write-Host "downloading llama cpu assets"
-    Download-Extract -Url $LLAMA_CPU_URL -DestFolder $llamaCpuDir
+    Write-Host "downloading llama vulkan assets"
+    Download-Extract -Url $LLAMA_VULKAN_URL -DestFolder $llamaVulkanDir
   }
 }
 
-if ($downloadAllAssets) {
-  if (!(Test-Path (Join-Path $llamaVulkanDir "llama.dll"))) {
-    if (Copy-TreeIfExists -SourceDir (Join-Path $cacheRoot "llama_vulkan") -DestDir $llamaVulkanDir) {
-      Write-Host "reused llama vulkan assets from cache"
-    } else {
-      Write-Host "downloading llama vulkan assets"
-      Download-Extract -Url $LLAMA_VULKAN_URL -DestFolder $llamaVulkanDir
-    }
-  }
-} else {
-  # Fast local build mode: create minimum runtime assets required by post_build copy steps.
-  New-Item -Path $llamaVulkanDir -ItemType Directory -Force | Out-Null
-
-  if (!(Test-Path (Join-Path $llamaVulkanDir "llama.dll"))) {
-    if (!(Copy-TreeIfExists -SourceDir (Join-Path $cacheRoot "llama_vulkan") -DestDir $llamaVulkanDir)) {
-      Copy-Item (Join-Path $llamaCpuDir "llama.dll") -Destination (Join-Path $llamaVulkanDir "llama.dll") -Force
-    }
-  }
-}
-
-Copy-Item (Join-Path $llamaCpuDir "llama.lib") -Destination (Join-Path $SourceDir "server-swift") -Force
+Copy-Item (Join-Path $llamaVulkanDir "llama.lib") -Destination (Join-Path $SourceDir "server-swift") -Force
 
 $cachedEmojiDictDir = Join-Path $cacheRoot "server-swift\\azooKey_emoji_dictionary_storage\\EmojiDictionary"
 $cachedMainDictDir = Join-Path $cacheRoot "server-swift\\azooKey_dictionary_storage\\Dictionary"

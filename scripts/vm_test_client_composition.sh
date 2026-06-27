@@ -388,7 +388,6 @@ create_archive() {
     --exclude-vcs \
     --exclude='./target' \
     --exclude='./build' \
-    --exclude='./frontend/node_modules' \
     --exclude='./.local' \
     --exclude='./logs' \
     .
@@ -478,7 +477,7 @@ function Copy-TreeIfExists {
 function Initialize-SwiftTestEnvironment {
   git config --global core.longpaths true
 
-  $llamaLibCache = Join-Path $cacheRoot "llama_cpu\llama.lib"
+  $llamaLibCache = Join-Path $cacheRoot "llama_vulkan\llama.lib"
   $llamaLibDest = Join-Path $SourceDir "server-swift\llama.lib"
   if ((Test-Path $llamaLibCache) -and !(Test-Path $llamaLibDest)) {
     Copy-Item $llamaLibCache -Destination $llamaLibDest -Force
@@ -679,9 +678,9 @@ function Invoke-SwiftPackageTests {
   $swiftToolchainBin = Split-Path (Get-Command swift).Source -Parent
   $xctestBin = Join-Path $platformDir.FullName "Windows.platform\Developer\Library\XCTest-development\usr\bin64"
   $testingBin = Join-Path $platformDir.FullName "Windows.platform\Developer\Library\Testing-development\usr\bin64"
-  $llamaCpuDir = Join-Path $cacheRoot "llama_cpu"
+  $llamaVulkanDir = Join-Path $cacheRoot "llama_vulkan"
 
-  foreach ($requiredPath in @($swiftRuntimeBin, $swiftToolchainBin, $xctestBin, $testingBin, $llamaCpuDir)) {
+  foreach ($requiredPath in @($swiftRuntimeBin, $swiftToolchainBin, $xctestBin, $testingBin, $llamaVulkanDir)) {
     if (!(Test-Path $requiredPath)) {
       throw "required swift test runtime path not found: $requiredPath"
     }

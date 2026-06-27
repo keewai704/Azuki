@@ -9,8 +9,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0"
-log = "0.4"
-fern = "0.7.0"
 chrono = "0.4.39"
 windows-core = "0.58.0"
 shared = { path = "../shared" }

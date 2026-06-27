@@ -455,7 +455,6 @@ function Assert-RequiredInstallFiles {
     "Dictionary",
     "EmojiDictionary",
     "EngineRuntime\Swift",
-    "EngineRuntime\llama_cpu",
     "EngineRuntime\llama_vulkan"
   )
 
@@ -483,16 +482,6 @@ function Test-WindowsAppRuntimeInstalled {
   }
 
   return $false
-}
-
-function Test-DotNetDesktopRuntimeInstalled {
-  $dotnetExe = Join-Path $env:ProgramFiles "dotnet\dotnet.exe"
-  if (!(Test-Path -LiteralPath $dotnetExe)) {
-    return $false
-  }
-
-  $runtimes = & $dotnetExe --list-runtimes
-  return [bool]($runtimes | Where-Object { $_ -like "Microsoft.WindowsDesktop.App 10.*" })
 }
 
 function Assert-OnlySettingsRemainAfterUninstall {
@@ -768,14 +757,10 @@ Assert-RequiredInstallFiles -InstallLocation $installLocation
 if (-not (Test-WindowsAppRuntimeInstalled)) {
   throw "Windows App Runtime 2.2 is missing after install."
 }
-if (-not (Test-DotNetDesktopRuntimeInstalled)) {
-  throw ".NET Desktop Runtime 10 is missing after install."
-}
 
 Write-Host "install complete. entry found: $($entry.PSChildName)"
 Write-Host "install location: $installLocation"
 Write-Host "Windows App Runtime 2.2 installed"
-Write-Host ".NET Desktop Runtime 10 installed"
 
 if ($VerifyLockedFileUpgrade) {
   if ($UninstallAfterInstall) {
@@ -820,7 +805,7 @@ if ($UninstallAfterInstall) {
 
   Wait-ForUninstallerSelfCleanup -InstallLocation $installLocation
   Assert-NoExternalAzookeyDirectoriesAfterUninstall -InstallLocation $installLocation
-  foreach ($relativePath in @("settings.exe", "settings-app", "frontend.exe", "azookey.dll", "azookey32.dll", "launcher.exe", "EngineRuntime")) {
+  foreach ($relativePath in @("settings.exe", "settings-app", "azookey.dll", "azookey32.dll", "launcher.exe", "EngineRuntime")) {
     $path = Join-Path $installLocation $relativePath
     if (Test-Path $path) {
       throw "Installed file still exists after uninstall: $path"

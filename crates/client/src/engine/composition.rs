@@ -23,8 +23,7 @@ use super::{
 #[cfg(test)]
 use shared::RomajiRule;
 use shared::{
-    zenzai_cpu_backend_supported, AppConfig, NumpadInputMode, SpaceInputMode,
-    LIVE_CONVERSION_READING_VERTICAL_ADJUSTMENT_MAX,
+    AppConfig, NumpadInputMode, SpaceInputMode, LIVE_CONVERSION_READING_VERTICAL_ADJUSTMENT_MAX,
     LIVE_CONVERSION_READING_VERTICAL_ADJUSTMENT_MIN,
 };
 use windows::core::{w, PCWSTR};
@@ -649,16 +648,7 @@ impl TextServiceFactory {
 
     #[inline]
     fn effective_zenzai_runtime_enabled(app_config: &AppConfig) -> bool {
-        if !app_config.zenzai.enable {
-            return false;
-        }
-
-        let backend = app_config.zenzai.backend.trim().to_ascii_lowercase();
-        if backend.is_empty() || backend == "cpu" {
-            return zenzai_cpu_backend_supported();
-        }
-
-        true
+        app_config.zenzai.enable
     }
 
     #[inline]
